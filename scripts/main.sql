@@ -1,3 +1,6 @@
+-- FIXME: Needs new name
+create database loanage;
+
 create table library (
   library_id int primary key,
   loc varchar(16),
