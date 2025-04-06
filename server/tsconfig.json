@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true,
+    "resolveJsonModule": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "outDir": "dist",
+    "esModuleInterop": true
+  },
+  "include": ["src"]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "oneshelf-server",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Tejada-Omar/CPSC471-project#readme",
+  "bugs": {
+    "url": "https://github.com/Tejada-Omar/CPSC471-project/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Tejada-Omar/CPSC471-project.git"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b",
+    "start": "node ./dist/src/app.js",
+    "dev": "nodemon",
+    "lint": "eslint . --ext ts --max-warnings 0"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.24.0",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.0",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.6",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.0"
+  }
+}
