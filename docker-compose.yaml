@@ -1,0 +1,34 @@
+name: oneshelf
+
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/pgpass
+      # Creates default database with single superuser
+      # Essentially equivalent to the following SQL statements on initialization
+      #
+      # CREATE DATABASE oneshelf;
+      # CREATE USER oneshelf WITH PASSWORD "$PGPASS";
+      # GRANT ALL PRIVILEGES ON DATABASE oneshelf TO oneshelf;
+      POSTGRES_USER: oneshelf
+      POSTGRES_DB: oneshelf
+    volumes:
+      - type: bind
+        source: ./init-scripts/
+        # Contains sql, sql.gz, or sh files
+        # Executed in sorted locale order (en_US.utf8 by default)
+        target: /docker-entrypoint-initdb.d/
+        read_only: true
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "oneshelf"]
+      interval: 10s
+      start_period: 30s
+    secrets:
+      - pgpass
+
+secrets:
+  pgpass:
+    # File must exist in order for postgres to start
+    file: .pgpass

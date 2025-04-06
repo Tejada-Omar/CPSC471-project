@@ -1,6 +1,3 @@
--- FIXME: Needs new name
-create database oneshelf;
-
 create table author (
   author_id int,
   aname varchar(64) not null,
@@ -62,7 +59,7 @@ create table admin (
 create table head_librarian (
   super_id int primary key,
   appointer int not null,
-  foreign key (super_id) references user (user_id)
+  foreign key (super_id) references user (user_id),
   foreign key (appointer) references admin (super_id)
 );
 
