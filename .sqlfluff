@@ -1,7 +1,7 @@
 # vim: set ft=confini:
 
 [sqlfluff]
-dialect = ansi
+dialect = postgres
 sql_file_exts = .sql
 
 [sqlfluff:indentation]
