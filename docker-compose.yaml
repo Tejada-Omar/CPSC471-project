@@ -4,6 +4,8 @@ services:
   db:
     image: postgres
     restart: unless-stopped
+    ports:
+      - "[::1]:8090:5432"
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/pgpass
       # Creates default database with single superuser
