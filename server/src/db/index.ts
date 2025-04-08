@@ -2,6 +2,19 @@ import { readFileSync } from 'node:fs';
 import pg from 'pg';
 const { Pool } = pg;
 
+// Env vars that must exist for pg to function correctly
+const pgEnvDefaults: Record<string, string> = {
+  PGHOST: 'localhost',
+  PGPORT: '8090',
+  PGPASSFILE: '.pgpass',
+};
+
+for (const [k, v] of Object.entries(pgEnvDefaults)) {
+  if (!process.env[k]) {
+    process.env[k] = v;
+  }
+}
+
 const pool = new Pool({
   database: 'oneshelf',
   user: 'oneshelf',
