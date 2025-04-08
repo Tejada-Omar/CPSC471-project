@@ -13,7 +13,7 @@
   "scripts": {
     "build": "tsc -b",
     "start": "node ./dist/src/app.js",
-    "dev": "nodemon",
+    "dev": "nodemon --",
     "lint": "eslint . --ext ts --max-warnings 0"
   },
   "dependencies": {
