@@ -1,11 +1,9 @@
 import express from 'express';
-import * as db from './db/index.js';
+import bookRouters from './routes/book.js';
 
 const app = express();
 
-app.get('/', async (_req, res) => {
-  const result = await db.query('SELECT * FROM book', []);
-  res.send(result.rows);
-});
+app.use(express.json());
+app.use('/book', bookRouters);
 
 export default app;
