@@ -1,6 +1,15 @@
 name: oneshelf
 
 services:
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    volumes:
+      - ./client:/app
+      - frontend-node-modules:/app/node_modules
+    ports:
+      - "5173:5173"
   db:
     image: postgres
     restart: unless-stopped
@@ -29,6 +38,9 @@ services:
       start_period: 30s
     secrets:
       - pgpass
+
+volumes:
+  frontend-node-modules:
 
 secrets:
   pgpass:
