@@ -19,6 +19,10 @@ const pool = new Pool({
   database: 'oneshelf',
   user: 'oneshelf',
   password() {
+    if (process.env.PGPASSWORD) {
+      return process.env.PGPASSWORD;
+    }
+
     const file = process.env.PGPASSFILE ?? '.pgpass';
     return (
       // Synchronous call should be fine since this is called at startup
