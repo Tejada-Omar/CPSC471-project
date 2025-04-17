@@ -1,0 +1,20 @@
+#signUpBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#signUpStack{
+    width: 40%;
+}
+
+#signUpTextfieldStack{
+    margin-top: 20%;
+}
+
+#signUpButtonBox {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
