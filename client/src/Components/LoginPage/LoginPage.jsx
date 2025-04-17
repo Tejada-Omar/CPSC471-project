@@ -1,17 +1,14 @@
 import { useState } from "react";
+import { Box, TextField, Button, Stack,} from "@mui/material";
+import PasswordBox from "../PasswordBox";
 
 const LoginPage = () => {
   const [count, setCount] = useState(0);
 
   return (
-    <>
-      <h1>This is the login page</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
+    <Box>
+
+    </Box>
   );
 };
 
