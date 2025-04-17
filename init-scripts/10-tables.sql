@@ -17,14 +17,15 @@ create table book (
   synopsis text,
   title varchar(64) not null,
   primary key (book_id, author_id),
-  foreign key (author_id) references author (author_id),
+  foreign key (author_id) references author (author_id)
 );
 
 create table genre (
   book_id int,
+  author_id int,
   label varchar(16),
-  primary key (book_id, label),
-  foreign key (book_id) references book (book_id)
+  primary key (book_id, author_id, label),
+  foreign key (book_id, author_id) references book (book_id, author_id)
 );
 
 create table library_contains (
