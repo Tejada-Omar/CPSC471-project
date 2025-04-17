@@ -1,0 +1,20 @@
+#loginBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#loginStack{
+    width: 40%;
+}
+
+#loginTextfieldStack{
+    margin-top: 20%;
+}
+
+#loginButtonBox {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
