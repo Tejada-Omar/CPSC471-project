@@ -20,9 +20,72 @@ declare global {
 interface JwtPayload {
   username: string;
   id: number;
-  role: 'admin' | 'user';
+  role: 'admin' | 'user' | 'librarian';
 }
 
+// Helper function to get the token from the Authorization header
+const getTokenFromHeader = (
+  authorization: string | undefined,
+): string | undefined => {
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '');
+  }
+  return undefined;
+};
+
+// Helper function to verify token and set userId
+const verifyTokenAndSetUserId = (
+  token: string,
+  validRoles: string[],
+): JwtPayload | null => {
+  try {
+    const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
+
+    if (!decodedToken.id || !validRoles.includes(decodedToken.role)) {
+      return null; // Invalid role
+    }
+
+    return decodedToken;
+  } catch (error) {
+    return null; // Invalid token
+  }
+};
+
+// Middleware to handle JWT verification and role-based authorization
+const roleConfirmation = (validRoles: string[]) => {
+  return (request: Request, _response: Response, next: NextFunction) => {
+    const authorization = request.get('authorization');
+    const token = getTokenFromHeader(authorization);
+
+    if (!token) {
+      return next(
+        new jwt.JsonWebTokenError('Authorization header is missing or invalid'),
+      );
+    }
+
+    const decodedToken = verifyTokenAndSetUserId(token, validRoles);
+
+    if (!decodedToken) {
+      return next(
+        new jwt.JsonWebTokenError('Invalid token or insufficient role'),
+      );
+    }
+
+    request.userId = decodedToken.id;
+    next();
+  };
+};
+
+// Specific role-based middlewares using the roleConfirmation function
+export const userConfirmation = roleConfirmation([
+  'user',
+  'admin',
+  'librarian',
+]);
+export const librarianConfirmation = roleConfirmation(['admin', 'librarian']);
+export const adminConfirmation = roleConfirmation(['admin']);
+
+// General error handler
 export const errorHandler: ErrorRequestHandler = (
   error: Error,
   _request,
@@ -36,46 +99,4 @@ export const errorHandler: ErrorRequestHandler = (
   }
 
   next(error);
-  return;
-};
-
-export const userConfirmation = (
-  request: Request,
-  _response: Response,
-  next: NextFunction,
-) => {
-  let token: string | undefined;
-
-  const authorization = request.get('authorization');
-  if (authorization && authorization.startsWith('Bearer ')) {
-    token = authorization.replace('Bearer ', '');
-
-    if (!token) {
-      return next(jwt.JsonWebTokenError);
-    }
-
-    try {
-      // jwt.verify returns a decoded token that could either be a JwtPayload or an object
-      const decodedToken = jwt.verify(token, SECRET) as JwtPayload;
-
-      // Ensure the decoded token contains the required fields
-      if (
-        !decodedToken.id ||
-        (decodedToken.role !== 'user' && decodedToken.role !== 'admin')
-      ) {
-        return next(jwt.JsonWebTokenError);
-      }
-
-      // Add the userId to the request object
-      request.userId = decodedToken.id;
-
-      next();
-    } catch (error) {
-      return next(error);
-    }
-  } else {
-    return next(
-      new jwt.JsonWebTokenError('Authorization header is missing or invalid'),
-    );
-  }
 };

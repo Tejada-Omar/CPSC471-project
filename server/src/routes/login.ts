@@ -12,11 +12,13 @@ interface UserRow {
   pass: string;
 }
 
+type role = 'admin' | 'librarian' | 'user';
+
 // JWT payload structure
 interface JwtPayload {
   username: string;
   id: number;
-  role: 'admin' | 'user';
+  role: role;
 }
 
 // Request body type
@@ -56,13 +58,25 @@ loginRouter.post(
         });
       }
 
+      let role: role = 'user';
+
+      const libraryResult = await db.query(
+        `SELECT 1 FROM librarian WHERE librarian_id = $1`,
+        [user.user_id.toString()],
+      );
+
+      if (libraryResult.rows.length > 0) {
+        role = 'librarian';
+      }
+
       const adminResult = await db.query(
         `SELECT 1 FROM admin WHERE super_id = $1`,
         [user.user_id.toString()],
       );
 
-      const role: 'admin' | 'user' =
-        adminResult.rows.length > 0 ? 'admin' : 'user';
+      if (adminResult.rows.length > 0) {
+        role = 'admin';
+      }
 
       const userForToken: JwtPayload = {
         username: user.username,
@@ -75,9 +89,12 @@ loginRouter.post(
         throw new Error('JWT secret is not defined in environment variables.');
       }
 
-      const token = jwt.sign(userForToken, secret, {
-        expiresIn: role === 'admin' ? 3600 : 604800, // 1 hour for admin or 1 week for reg user
-      });
+      let token;
+      if (role === 'admin' || role === 'librarian') {
+        token = jwt.sign(userForToken, secret, { expiresIn: 60 * 60 }); // Token expires after one hour for admin or librarian
+      } else {
+        token = jwt.sign(userForToken, secret, { expiresIn: 604800 }); // Token expires in one week for normal user
+      }
 
       return response.status(200).send({
         token,
