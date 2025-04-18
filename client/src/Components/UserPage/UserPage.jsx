@@ -20,7 +20,7 @@ const UserPage = () => {
 
       <Box id="userLoans">
         <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-          Active Loans
+          My Loans
         </Typography>
       </Box>
     </Box>
