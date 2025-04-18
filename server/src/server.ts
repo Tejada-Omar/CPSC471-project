@@ -23,4 +23,4 @@ const shutdown = () => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
-process.on('SIGUS2', shutdown); // Sent by nodemon when reloading
+//process.on('SIGUS2', shutdown); // Sent by nodemon when reloading

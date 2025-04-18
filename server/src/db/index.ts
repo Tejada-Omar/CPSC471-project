@@ -1,4 +1,8 @@
 import { readFileSync } from 'node:fs';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 import pg from 'pg';
 const { Pool } = pg;
 
@@ -15,28 +19,29 @@ for (const [k, v] of Object.entries(pgEnvDefaults)) {
   }
 }
 
+const getPassword = () => {
+  if (process.env.PGPASSWORD) {
+    return process.env.PGPASSWORD;
+  }
+
+  const file = process.env.PGPASSFILE ?? '.pgpass';
+  return (
+    // Synchronous call should be fine since this is called at startup
+    readFileSync(file)
+      .toString()
+      // Line-endings are trimmed when password is created using PGPASSFILE
+      // Emulates behaviour on unixy systems where LF is default line-ending
+      // NOTE: No clue how this works on windows w/ CRLF line-endings
+      .slice(0)
+  );
+};
+
 const pool = new Pool({
   database: 'oneshelf',
   user: 'oneshelf',
   host: 'localhost',
   port: 5432,
-  password: process.env.PGPASSWORD || 'password',
-  /* password() {
-    if (process.env.PGPASSWORD) {
-      return process.env.PGPASSWORD;
-    }
-
-    const file = process.env.PGPASSFILE ?? '.pgpass';
-    return (
-      // Synchronous call should be fine since this is called at startup
-      readFileSync(file)
-        .toString()
-        // Line-endings are trimmed when password is created using PGPASSFILE
-        // Emulates behaviour on unixy systems where LF is default line-ending
-        // NOTE: No clue how this works on windows w/ CRLF line-endings
-        .slice(0, -1)
-    );
-  }, */
+  password: getPassword(),
 });
 
 export const getClient = () => {
