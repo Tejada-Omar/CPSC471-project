@@ -5,6 +5,7 @@ import SignUpPage from "./Components/SignUpPage/SignUpPage";
 import AdminPage from "./Components/AdminPage/AdminPage";
 import LibrarianPage from "./Components/LibrarianPage/LibrarianPage";
 import UserPage from "./Components/UserPage/UserPage";
+import BookPage from "./Components/BookPage/BookPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/admin" element={<AdminPage></AdminPage>}></Route>
           <Route path="/librarian" element={<LibrarianPage></LibrarianPage>}></Route>
           <Route path="/user" element={<UserPage></UserPage>}></Route>
+          {/* <Route path="/book/:id" element={<BookPage></BookPage>}></Route> */}
         </Routes>
       </BrowserRouter>
     </>

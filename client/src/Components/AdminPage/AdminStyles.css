@@ -1,0 +1,15 @@
+#adminBox {
+    margin: 0 10% 0 10%;
+}
+
+#adminHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.adminSection {
+    margin-top: 5%;
+    padding: 2%;
+    border: 2px solid;
+    border-color: black;
+}
