@@ -1,0 +1,9 @@
+#homeStack {
+    margin: 0 10% 0 10%;
+}
+
+#homeHeaderBox {
+    display: flex;
+    justify-content: space-between;
+}
+
