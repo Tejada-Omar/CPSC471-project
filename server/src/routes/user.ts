@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import * as db from '../db/index.js'; // Make sure your db layer supports transactions
+import * as db from '../db/index.js';
 
 const userRouter = express.Router();
 
