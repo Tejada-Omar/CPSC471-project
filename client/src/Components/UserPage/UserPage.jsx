@@ -13,7 +13,16 @@ const UserPage = () => {
 
   return (
     <Box id="userBox">
-      <Typography variant="h3">Hello user!</Typography>
+      <Box id="userHeader">
+        <Typography variant="h3">Hello user!</Typography>
+        <Button onClick={() => handleClick("/")}>Return home</Button>
+      </Box>
+
+      <Box id="userLoans">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Active Loans
+        </Typography>
+      </Box>
     </Box>
   );
 };

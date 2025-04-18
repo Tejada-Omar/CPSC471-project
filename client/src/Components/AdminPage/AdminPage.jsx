@@ -13,7 +13,28 @@ const AdminPage = () => {
 
   return (
     <Box id="adminBox">
-      Admin Page
+      <Box id="adminHeader">
+        <Typography variant="h3">Admin Dashboard</Typography>
+        <Button onClick={() => handleClick("/")}>Return home</Button>
+      </Box>
+
+      <Box class="adminSection">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Users
+        </Typography>
+      </Box>
+
+      <Box class="adminSection">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Reviews
+        </Typography>
+      </Box>
+
+      <Box class="adminSection">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Librarians
+        </Typography>
+      </Box>
     </Box>
   );
 };

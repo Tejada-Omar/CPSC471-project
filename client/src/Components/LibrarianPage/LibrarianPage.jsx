@@ -13,7 +13,22 @@ const LibrarianPage = () => {
 
   return (
     <Box id="librarianBox">
-      Librarian Page
+      <Box id="librarianHeader">
+        <Typography variant="h3">Librarian Dashboard</Typography>
+        <Button onClick={() => handleClick("/")}>Return home</Button>
+      </Box>
+
+      <Box class="librarianSection">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Active Loans
+        </Typography>
+      </Box>
+
+      <Box class="librarianSection">
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          Pending Loans
+        </Typography>
+      </Box>
     </Box>
   );
 };
