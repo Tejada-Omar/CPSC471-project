@@ -48,7 +48,7 @@ export const getClient = () => {
   return pool.connect();
 };
 
-export const query = (text: string, params?: string[]) => {
+export const query = (text: string, params?: (string | null)[]) => {
   console.debug('query executed', { text, params });
   // undefined params implicitly treated as empty
   return pool.query(text, params);
