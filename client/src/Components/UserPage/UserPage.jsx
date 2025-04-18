@@ -12,8 +12,8 @@ const UserPage = () => {
   };
 
   return (
-    <Box id="adminBox">
-      User Page
+    <Box id="userBox">
+      <Typography variant="h3">Hello user!</Typography>
     </Box>
   );
 };
