@@ -88,8 +88,9 @@ create table authentication (
 );
 
 create table monitors_user (
-  admin_id int not null primary key,
+  admin_id int not null,
   user_id int not null,
+  PRIMARY KEY (admin_id, user_id),
   foreign key (admin_id) references admin (super_id),
   foreign key (user_id) references users (user_id)
 );
@@ -115,3 +116,82 @@ create table review (
   foreign key (user_id) references users (user_id),
   foreign key (book_id, author_id) references book (book_id, author_id)
 );
+
+-- 1. author table
+INSERT INTO author (aname, biography) VALUES
+('J.K. Rowling', 'British author, best known for the Harry Potter series.'),
+('George Orwell', 'English novelist and essayist, famous for books like 1984 and Animal Farm.'),
+('J.R.R. Tolkien', 'English writer and academic, best known for The Hobbit and The Lord of the Rings.');
+
+-- 2. library table
+INSERT INTO library (loc, library_name) VALUES
+('New York', 'Central Library'),
+('London', 'City Library'),
+('Los Angeles', 'LA Public Library');
+
+-- 3. book table
+INSERT INTO book (author_id, pdate, synopsis, title) VALUES
+(1, '1997-06-26', 'A young boy discovers he is a wizard and attends Hogwarts School of Witchcraft and Wizardry.', 'Harry Potter and the Philosopher''s Stone'),
+(2, '1945-08-17', 'A dystopian novel about a totalitarian regime that uses surveillance and mind control to dominate society.', '1984'),
+(3, '1954-07-29', 'An epic fantasy story about a young hobbit who embarks on a journey to destroy a powerful ring.', 'The Fellowship of the Ring');
+
+-- 4. genre table
+INSERT INTO genre (book_id, author_id, label) VALUES
+(1, 1, 'Fantasy'),
+(2, 2, 'Dystopian'),
+(3, 3, 'Fantasy');
+
+-- 5. library_contains table
+INSERT INTO library_contains (library_id, book_id, author_id, no_of_copies) VALUES
+(1, 1, 1, 10),
+(2, 2, 2, 5),
+(3, 3, 3, 7);
+
+-- 6. users table
+INSERT INTO users (uname, address, phone_no) VALUES
+('john_doe', '123 Main St, New York', '+1234567890'),
+('alice_smith', '456 Oak St, London', '+1987654321'),
+('bob_jones', '789 Pine St, Los Angeles', '+1122334455');
+
+-- 7. admin table
+INSERT INTO admin (super_id) VALUES
+(1),
+(2);
+
+-- 8. head_librarian table
+INSERT INTO head_librarian (super_id, appointer) VALUES
+(1, 1),
+(2, 1);
+
+-- 9. librarian table
+INSERT INTO librarian (librarian_id, manager_id, library_id) VALUES
+(1, 1, 1),
+(2, 2, 2);
+
+-- 10. loan table
+INSERT INTO loan (user_id, ret_date, start_date, librarian_id) VALUES
+(1, '2025-04-20 10:00:00+00', '2025-04-10 10:00:00+00', 1),
+(2, '2025-04-22 10:00:00+00', '2025-04-11 10:00:00+00', 2);
+
+-- 11. authentication table
+INSERT INTO authentication (user_id, username, pass) VALUES
+(1, 'john_doe', 'hashed_password_123'),
+(2, 'alice_smith', 'hashed_password_456'),
+(3, 'bob_jones', 'hashed_password_789');
+
+-- 12. monitors_user table
+INSERT INTO monitors_user (admin_id, user_id) VALUES
+(1, 1),
+(1, 2),
+(2, 3);
+
+-- 13. loan_book table
+INSERT INTO loan_book (loan_id, user_id, book_id, author_id) VALUES
+(1, 1, 1, 1),
+(2, 2, 2, 2);
+
+-- 14. review table
+INSERT INTO review (user_id, rating, body, book_id, author_id) VALUES
+(1, 5, 'An amazing book that captivates the reader from the start.', 1, 1),
+(2, 4, 'A thought-provoking book that offers much insight into political systems.', 2, 2),
+(3, 5, 'An epic fantasy adventure with unforgettable characters and landscapes.', 3, 3);

@@ -5,7 +5,7 @@ const { Pool } = pg;
 // Env vars that must exist for pg to function correctly
 const pgEnvDefaults: Record<string, string> = {
   PGHOST: 'localhost',
-  PGPORT: '8090',
+  PGPORT: '5432',
   PGPASSFILE: '.pgpass',
 };
 
@@ -18,7 +18,10 @@ for (const [k, v] of Object.entries(pgEnvDefaults)) {
 const pool = new Pool({
   database: 'oneshelf',
   user: 'oneshelf',
-  password() {
+  host: 'localhost',
+  port: 5432,
+  password: process.env.PGPASSWORD || 'password',
+  /* password() {
     if (process.env.PGPASSWORD) {
       return process.env.PGPASSWORD;
     }
@@ -33,7 +36,7 @@ const pool = new Pool({
         // NOTE: No clue how this works on windows w/ CRLF line-endings
         .slice(0, -1)
     );
-  },
+  }, */
 });
 
 export const getClient = () => {
