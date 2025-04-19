@@ -1,9 +1,49 @@
 #homeStack {
-    margin: 0 10% 0 10%;
+  margin: 0 10%;
 }
 
 #homeHeaderBox {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
+#homeHeaderBox h2 {
+  font-size: 2.5rem;
+}
+
+#homeButtonBox {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#bookCard:hover {
+  background-color: rgb(194, 232, 255);
+}
+
+@media (max-width: 768px) {
+  #homeStack {
+    margin: 1rem;
+  }
+
+  #homeHeaderBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #homeHeaderBox h2 {
+    font-size: 2rem;
+  }
+
+  #homeButtonBox {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #homeButtonBox button {
+    width: 100%;
+  }
+}
