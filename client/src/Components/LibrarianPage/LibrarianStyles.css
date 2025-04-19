@@ -7,9 +7,16 @@
     justify-content: space-between;
 }
 
+#librarianAddButtons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2%;
+}
+
 .librarianSection {
-    margin-top: 5%;
+    margin-top: 2%;
     padding: 2%;
     border: 2px solid;
     border-color: black;
 }
+

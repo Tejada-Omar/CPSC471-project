@@ -1,0 +1,13 @@
+#addBookBox {
+    margin: 0 10% 0 10%;
+}
+
+#addBookHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+#addBookForm {
+    margin-top: 2%;
+}
+

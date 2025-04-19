@@ -1,0 +1,13 @@
+#addLibraryBox {
+    margin: 0 10% 0 10%;
+}
+
+#addLibraryHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+#addLibraryForm {
+    margin-top: 2%;
+}
+

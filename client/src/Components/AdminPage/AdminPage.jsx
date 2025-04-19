@@ -18,6 +18,11 @@ const AdminPage = () => {
         <Button onClick={() => handleClick("/")}>Return home</Button>
       </Box>
 
+      <Box id="librarianButtons">
+        <Button onClick={() => handleClick("/addLibrary")}> Add Library </Button>
+        <Button onClick={() => handleClick("/appointLibrarian")}> Appoint Librarian </Button>
+      </Box>
+
       <Box class="adminSection">
         <Typography variant="h5" sx={{ textDecoration: "underline" }}>
           Users

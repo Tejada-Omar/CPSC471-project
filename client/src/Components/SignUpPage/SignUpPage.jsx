@@ -16,14 +16,21 @@ const SignUpPage = () => {
     <Box id="signUpBox">
       <Stack id="signUpStack">
         <Typography variant="h1"> OneShelf </Typography>
-        <Stack id="signUpTextfieldStack" spacing={5}>
+        <Stack id="signUpForm" spacing={5}>
           <TextField
+            required
             id="signUpUser"
             label="Create Username"
             variant="standard"
           />
           <PasswordBox label="Create Password"></PasswordBox>
           <PasswordBox label="Confirm Password"></PasswordBox>
+          <TextField
+            required
+            id="signUpPhone"
+            label="Phone Number - Ex. +1234567890"
+            variant="standard"
+          />
           <Box id="signUpButtonBox">
             <Button onClick={() => handleClick("/login")}>
               Back to Login
