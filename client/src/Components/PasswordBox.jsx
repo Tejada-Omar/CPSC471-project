@@ -26,6 +26,7 @@ export default function PasswordBox({ label = 'Password', id = 'password', onCha
       <FormControl sx={{ m: 0, width: '100%' }} variant="standard">
         <InputLabel htmlFor={`standard-adornment-${id}`}>{label}</InputLabel>
         <Input
+          required="true"
           id={`standard-adornment-${id}`}
           type={showPassword ? 'text' : 'password'}
           onChange={onChange}

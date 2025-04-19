@@ -17,8 +17,8 @@ const LoginPage = () => {
       <Stack id="loginStack">
         <Typography variant="h1"> OneShelf </Typography>
         <Stack component="form" id="loginForm" spacing={5}>
-          <TextField id="loginUser" label="Username" variant="standard" />
-          <PasswordBox></PasswordBox>
+          <TextField required id="loginUser" label="Username" variant="standard" />
+          <PasswordBox required></PasswordBox>
           <Box id="loginButtonBox">
             <Button onClick={() => handleClick("/signUp")}>
               Create Account

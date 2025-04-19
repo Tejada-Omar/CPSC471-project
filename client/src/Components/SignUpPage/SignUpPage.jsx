@@ -16,8 +16,9 @@ const SignUpPage = () => {
     <Box id="signUpBox">
       <Stack id="signUpStack">
         <Typography variant="h1"> OneShelf </Typography>
-        <Stack id="signUpTextfieldStack" spacing={5}>
+        <Stack id="signUpForm" spacing={5}>
           <TextField
+            required
             id="signUpUser"
             label="Create Username"
             variant="standard"
