@@ -16,6 +16,7 @@ import "./HomeStyles.css";
 const HomePage = () => {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetch(`${API_URL}/book`)
@@ -32,6 +33,12 @@ const HomePage = () => {
     navigate(`/book/${book_id}/${author_id}`);
   };
 
+  const filteredBooks = books.filter(
+    (book) =>
+      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      book.synopsis.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Stack id="homeStack" spacing={2}>
       <Box id="homeHeaderBox">
@@ -45,10 +52,13 @@ const HomePage = () => {
         </Box>
       </Box>
 
-      <SearchBar placeholder="Search for books..." />
+      <SearchBar
+        onSearchChange={setSearchQuery}
+        placeholder="Search for books..."
+      />
 
       <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
-        {books.map((book) => (
+        {filteredBooks.map((book) => (
           <Card
             key={`${book.book_id}-${book.author_id}`}
             sx={{ width: 300, cursor: "pointer" }}
