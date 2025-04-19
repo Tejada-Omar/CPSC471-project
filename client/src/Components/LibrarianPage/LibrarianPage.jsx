@@ -18,10 +18,19 @@ const LibrarianPage = () => {
         <Button onClick={() => handleClick("/")}>Return home</Button>
       </Box>
 
-      <Box id="librarianButtons">
-        <Button onClick={() => handleClick("/addBook")}> Add Book </Button>
-        <Button onClick={() => handleClick("/addAuthor")}> Add Author </Button>
+      <Box id="librarianAddButtons">
+        <Box>
+          <Button onClick={() => handleClick("/addBook")}> Add Book </Button>
+          <Button onClick={() => handleClick("/addAuthor")}>
+            Add Author
+          </Button>
+        </Box>
+
+        <Box>
+          <Button onClick={() => handleClick("/manageLibrarians")}> Manage Librarians </Button>
+        </Box>
       </Box>
+
       <Box class="librarianSection">
         <Typography variant="h5" sx={{ textDecoration: "underline" }}>
           Active Loans

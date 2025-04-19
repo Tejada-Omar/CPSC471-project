@@ -25,6 +25,12 @@ const SignUpPage = () => {
           />
           <PasswordBox label="Create Password"></PasswordBox>
           <PasswordBox label="Confirm Password"></PasswordBox>
+          <TextField
+            required
+            id="signUpPhone"
+            label="Phone Number - Ex. +1234567890"
+            variant="standard"
+          />
           <Box id="signUpButtonBox">
             <Button onClick={() => handleClick("/login")}>
               Back to Login
