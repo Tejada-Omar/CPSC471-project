@@ -153,7 +153,7 @@ router.post(
       const insertBookQuery = `
         INSERT INTO book (author_id, pdate, synopsis, title)
         VALUES ($1, $2, $3, $4)
-        RETURNING book_id;
+        RETURNING *;
         `;
       const fResult = await client.query(insertBookQuery, [
         data.authorId,
@@ -162,14 +162,19 @@ router.post(
         data.title,
       ]);
       // Guaranteed by schema
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const bookId = fResult.rows[0].book_id as number;
+      const book = mapBookResult(
+        (fResult.rows as Record<string, unknown>[])[0],
+      );
 
       const insertGenreQuery = `
         INSERT INTO genre (book_id, author_id, label)
         VALUES ($1, $2, $3);
         `;
-      await client.query(insertGenreQuery, [bookId, data.authorId, data.genre]);
+      await client.query(insertGenreQuery, [
+        book.id,
+        data.authorId,
+        data.genre,
+      ]);
 
       const insertLibraryRelationQuery = `
         INSERT INTO library_contains (library_id, book_id, author_id, no_of_copies)
@@ -177,13 +182,13 @@ router.post(
         `;
       await client.query(insertLibraryRelationQuery, [
         data.libraryId,
-        bookId,
+        book.id,
         data.authorId,
         data.noOfCopies,
       ]);
 
       await client.query('COMMIT');
-      res.sendStatus(200);
+      res.status(200).json(book);
     } catch (e) {
       await client.query('ROLLBACK');
       // TODO: Set proper code based on error
