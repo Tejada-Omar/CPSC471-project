@@ -143,7 +143,6 @@ router.post(
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
-      console.log(vResult);
       res.sendStatus(400);
       return;
     }
