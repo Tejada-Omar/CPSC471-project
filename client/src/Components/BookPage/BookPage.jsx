@@ -17,6 +17,7 @@ const BookPage = () => {
   const { bookId, authorId } = useParams();
   const [book, setBook] = useState({});
   const [reviewData, setReviewData] = useState([]);
+  const [libraryData, setLibraryData] = useState([]);
 
   useEffect(() => {
     /* fetch(`${API_URL}/<something>`)
@@ -25,6 +26,7 @@ const BookPage = () => {
       .catch((err) => console.error("Failed to fetch books:", err)); */
     setBook(mockBook);
     setReviewData(mockReviewData);
+    setLibraryData(mockLibraries);
   }, []);
 
   const mockBook = {
@@ -87,13 +89,19 @@ const BookPage = () => {
     },
   ];
 
+  const mockLibraries = [
+    { library_id: 101, name: "Downtown Public Library", copies: 3 },
+    { library_id: 102, name: "Northside Community Library", copies: 0 },
+    { library_id: 103, name: "University Library", copies: 5 },
+  ];
+
   const navigate = useNavigate();
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleClick = (url) => {
-    navigate(url);
+  const handleLoanRequest = (libraryId) => {
+    navigate(`/loan-request/${libraryId}/${bookId}/${authorId}`);
   };
 
   const averageRating =
@@ -148,9 +156,52 @@ const BookPage = () => {
 
           <Box>
             <Typography variant="h6">Synopsis</Typography>
-            <Typography variant="body1" mt={1} mb={4}>
+            <Typography variant="body1" mt={1} mb={8}>
               {book.synopsis}
             </Typography>
+          </Box>
+
+          <Divider />
+
+          {/* Libraries Section */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Libraries
+            </Typography>
+            <Stack spacing={2}>
+              {libraryData.map((library) => (
+                <Box
+                  key={library.library_id}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  p={2}
+                  sx={{ border: "1px solid #eee", borderRadius: 2 }}
+                >
+                  <Box>
+                    <Typography variant="subtitle1">{library.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Copies available: {library.copies}
+                    </Typography>
+                  </Box>
+                  {library.copies > 0 && (
+                    <button
+                      onClick={() => handleLoanRequest(library.library_id)}
+                      style={{
+                        backgroundColor: "#1976d2",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Request Loan
+                    </button>
+                  )}
+                </Box>
+              ))}
+            </Stack>
           </Box>
 
           <Divider />
@@ -161,7 +212,7 @@ const BookPage = () => {
               Reviews
             </Typography>
             <Stack spacing={3}>
-              {mockReviewData.map((review) => (
+              {reviewData.map((review) => (
                 <Box
                   key={review.review_id}
                   p={2}
