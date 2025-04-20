@@ -250,6 +250,28 @@ const BookPage = () => {
             <Typography variant="h6" gutterBottom>
               Reviews
             </Typography>
+            <Box display="flex" justifyContent="flex-end" mb={1}>
+              <button
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#1976d2",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+                onClick={() => {
+                  // Placeholder action
+                  alert(
+                    "Redirect to review form, this button should prob only be visible to logged in users as well."
+                  );
+                }}
+              >
+                Leave a Review
+              </button>
+            </Box>
+
             <Stack spacing={3}>
               {reviewData.map((review) => (
                 <Box
