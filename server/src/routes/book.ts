@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as db from '../db/index.js';
-import pg from 'pg';
 import {
   body,
   matchedData,
@@ -11,7 +10,7 @@ import {
 
 const router = Router();
 
-interface Book {
+export interface Book {
   id: number;
   authorId: number;
   title: string;
@@ -19,17 +18,14 @@ interface Book {
   synopsis: string;
 }
 
-function mapBookResult(result: pg.QueryResult): Book[] {
-  // Will only break if the database schema changes
-  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-  return result.rows.map((r) => ({
-    id: r.book_id,
-    authorId: r.author_id,
-    publishedDate: r.pdate,
-    synopsis: r.synopsis,
-    title: r.title,
-  }));
-  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+export function mapBookResult(row: Record<string, unknown>): Book {
+  return {
+    id: row.book_id as number,
+    authorId: row.author_id as number,
+    publishedDate: row.pdate as Date,
+    synopsis: row.synopsis as string,
+    title: row.title as string,
+  };
 }
 
 // Search for a book by the title
@@ -58,7 +54,8 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   if (result.rows.length === 0) {
     res.sendStatus(404);
   } else {
-    res.send(mapBookResult(result));
+    const rows = result.rows as Record<string, unknown>[];
+    res.send(rows.map((r) => mapBookResult(r)));
   }
 });
 
