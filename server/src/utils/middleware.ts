@@ -93,9 +93,11 @@ export const errorHandler: ErrorRequestHandler = (
   next,
 ) => {
   if (error.name === 'JsonWebTokenError') {
-    return response.status(401).json({ error: 'token invalid' });
+    response.status(401).json({ error: 'token invalid' });
+    return;
   } else if (error.name === 'TokenExpiredError') {
-    return response.status(401).json({ error: 'token expired' });
+    response.status(401).json({ error: 'token expired' });
+    return;
   }
 
   next(error);

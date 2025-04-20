@@ -35,8 +35,11 @@ function mapBookResult(result: pg.QueryResult): Book[] {
 // Search for a book by the title
 router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   const vResult = validationResult(req);
+
+  // If no query, return all books
   if (!vResult.isEmpty()) {
-    res.status(400).send('Missing search parameters');
+    const result = await db.query('SELECT * FROM book');
+    res.send(mapBookResult(result));
     return;
   }
 
