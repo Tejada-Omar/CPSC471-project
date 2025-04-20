@@ -94,6 +94,7 @@ router.delete(
 // Edit a book
 router.put(
   '/:bookId',
+  param('bookId').isInt({ min: 1 }),
   query('authorId').isInt({ min: 1 }),
   body('title').trim().notEmpty().optional(),
   body('publishedDate').isDate().optional(),
