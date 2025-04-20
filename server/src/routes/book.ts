@@ -7,6 +7,7 @@ import {
   query,
   validationResult,
 } from 'express-validator';
+import { librarianConfirmation } from '../utils/middleware.js';
 
 const router = Router();
 
@@ -34,8 +35,8 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
 
   // If no query, return all books
   if (!vResult.isEmpty()) {
-    const result = await db.query('SELECT * FROM book');
-    res.send(mapBookResult(result));
+    /* const result = await db.query('SELECT * FROM book');
+    res.send(mapBookResult(result)); */
     return;
   }
 
@@ -65,6 +66,7 @@ router.delete(
   '/:bookId',
   param('bookId').isInt({ min: 1 }),
   query('libraryId').isInt({ min: 1 }),
+  query('authorId').isInt({ min: 1 }),
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
@@ -75,13 +77,14 @@ router.delete(
     const data = matchedData(req);
     const deleteByIdQuery = `
       DELETE FROM library_contains
-      WHERE library_id = $1 AND book_id = $2
+      WHERE library_id = $1 AND book_id = $2 AND author_id = $3
       RETURNING 'deleted' AS status;
       `;
 
     const result = await db.query(deleteByIdQuery, [
       data.libraryId,
       data.bookId,
+      data.authorId,
     ]);
     if (result.rows.length === 0) {
       res.sendStatus(404);
@@ -94,6 +97,7 @@ router.delete(
 // Edit a book
 router.put(
   '/:bookId',
+  param('bookId').isInt({ min: 1 }),
   query('authorId').isInt({ min: 1 }),
   body('title').trim().notEmpty().optional(),
   body('publishedDate').isDate().optional(),
