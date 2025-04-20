@@ -21,6 +21,13 @@ export function mapAuthorResult(row: Record<string, unknown>): Author {
 
 const router = express.Router();
 
+router.get('/', async (_req, res) => {
+  const searchQuery = 'SELECT * FROM author';
+  const result = await db.query(searchQuery);
+  const rows = result.rows as Record<string, unknown>[];
+  res.send(rows.map((r) => mapAuthorResult(r)));
+});
+
 router.get(
   '/:authorId',
   param('authorId').isInt({ min: 1 }),
