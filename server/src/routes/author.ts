@@ -109,12 +109,12 @@ router.post(
       data.biography,
     ]);
     if (result.rows.length === 0) {
-      res.sendStatus(404);
+      res.sendStatus(500);
       return;
     }
 
     const row = (result.rows as Record<string, unknown>[])[0];
-    res.json(mapAuthorResult(row));
+    res.status(201).json(mapAuthorResult(row));
   },
 );
 

@@ -236,7 +236,7 @@ router.post(
       ]);
 
       await client.query('COMMIT');
-      res.status(200).json(book);
+      res.status(201).json(book);
     } catch (e) {
       await client.query('ROLLBACK');
       // TODO: Set proper code based on error
