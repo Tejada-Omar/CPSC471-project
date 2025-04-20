@@ -114,7 +114,7 @@ router.post(
     }
 
     const row = (result.rows as Record<string, unknown>[])[0];
-    res.json(mapAuthorResult(row));
+    res.status(201).json(mapAuthorResult(row));
   },
 );
 
