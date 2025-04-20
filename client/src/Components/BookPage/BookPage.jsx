@@ -18,6 +18,7 @@ const BookPage = () => {
   const [book, setBook] = useState({});
   const [reviewData, setReviewData] = useState([]);
   const [libraryData, setLibraryData] = useState([]);
+  const [genres, setGenres] = useState([]);
 
   useEffect(() => {
     /* fetch(`${API_URL}/<something>`)
@@ -27,6 +28,7 @@ const BookPage = () => {
     setBook(mockBook);
     setReviewData(mockReviewData);
     setLibraryData(mockLibraries);
+    setGenres(mockGenres);
   }, []);
 
   const mockBook = {
@@ -96,6 +98,8 @@ const BookPage = () => {
     { library_id: 103, name: "University Library", copies: 5 },
   ];
 
+  const mockGenres = ["Fantasy", "Adventure", "Young Adult"];
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -160,9 +164,40 @@ const BookPage = () => {
 
           <Box>
             <Typography variant="h6">Synopsis</Typography>
-            <Typography variant="body1" mt={1} mb={8}>
+            <Typography variant="body1" mt={1}>
               {book.synopsis}
             </Typography>
+          </Box>
+
+          {/* Genres Section */}
+          <Box>
+            <Typography variant="h6">Genres</Typography>
+            <Stack direction="row" spacing={2} mt={1} mb={4} flexWrap="wrap">
+              {genres.map((genre, index) => (
+                <Typography
+                  key={index}
+                  sx={{
+                    fontWeight: "bold",
+                    position: "relative",
+                    display: "inline-block",
+                    pb: "4px",
+                    cursor: "default",
+                    "&::after": {
+                      content: '""',
+                      position: "absolute",
+                      left: 0,
+                      bottom: 0,
+                      width: "100%",
+                      height: "3px",
+                      backgroundColor: "#90caf9", // Light blue underline
+                      borderRadius: "2px",
+                    },
+                  }}
+                >
+                  {genre}
+                </Typography>
+              ))}
+            </Stack>
           </Box>
 
           <Divider />
