@@ -109,7 +109,7 @@ router.post(
       data.biography,
     ]);
     if (result.rows.length === 0) {
-      res.sendStatus(404);
+      res.sendStatus(500);
       return;
     }
 
