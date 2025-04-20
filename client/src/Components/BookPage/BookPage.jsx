@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -32,6 +32,7 @@ const BookPage = () => {
   const mockBook = {
     book_id: 1,
     author_id: 1,
+    author_name: "J. K. Rowling",
     pdate: "1997-06-26",
     title: "Harry Potter and the Philosopher's Stone",
     synopsis:
@@ -95,13 +96,16 @@ const BookPage = () => {
     { library_id: 103, name: "University Library", copies: 5 },
   ];
 
-  const navigate = useNavigate();
-
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleLoanRequest = (libraryId) => {
-    navigate(`/loan-request/${libraryId}/${bookId}/${authorId}`);
+    const userResponse = confirm(
+      `Do you want to request a loan for ${book.title} by ${book.author_name} from ${libraryId}?`
+    );
+    if (userResponse) {
+      alert("create loan request");
+    }
   };
 
   const averageRating =
@@ -130,7 +134,7 @@ const BookPage = () => {
               {book.title}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Author name here
+              {book.author_name}
             </Typography>
           </Stack>
 
@@ -186,7 +190,7 @@ const BookPage = () => {
                   </Box>
                   {library.copies > 0 && (
                     <button
-                      onClick={() => handleLoanRequest(library.library_id)}
+                      onClick={() => handleLoanRequest(library.name)}
                       style={{
                         backgroundColor: "#1976d2",
                         color: "white",
