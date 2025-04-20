@@ -70,8 +70,9 @@ const HomePage = () => {
                 {book.title}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {book.synopsis?.slice(0, 100) + "..." ||
-                  "No synopsis available..."}
+                {book.synopsis
+                  ? book.synopsis.slice(0, 100) + "..."
+                  : "No synopsis available..."}
               </Typography>
             </CardContent>
           </Card>
