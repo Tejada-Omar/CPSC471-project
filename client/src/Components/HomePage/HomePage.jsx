@@ -17,12 +17,22 @@ const HomePage = () => {
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_URL}/book`)
-      .then((res) => res.json())
-      .then((data) => setBooks(data))
-      .catch((err) => console.error("Failed to fetch books:", err));
+    const fetchBooks = async () => {
+      try {
+        const response = await fetch(`${API_URL}/book`);
+        const data = await response.json();
+        setBooks(data);
+      } catch (err) {
+        console.error("Failed to fetch books:", err);
+      } finally {
+        setIsLoading(false); // Set loading to false when done
+      }
+    };
+
+    fetchBooks();
   }, []);
 
   const handleClick = (url) => {
@@ -33,11 +43,13 @@ const HomePage = () => {
     navigate(`/book/${book_id}/${author_id}`);
   };
 
-  const filteredBooks = books.filter(
-    (book) =>
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.synopsis.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBooks = books.filter((book) =>
+    book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return <>loading...</>;
+  }
 
   return (
     <Stack id="homeStack" spacing={2}>
@@ -60,10 +72,10 @@ const HomePage = () => {
       <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
         {filteredBooks.map((book) => (
           <Card
-            key={`${book.book_id}-${book.author_id}`}
+            key={`${book.id}-${book.authorId}`}
             sx={{ width: 300, cursor: "pointer" }}
             id="bookCard"
-            onClick={() => handleBookClick(book.book_id, book.author_id)}
+            onClick={() => handleBookClick(book.id, book.authorId)}
           >
             <CardContent>
               <Typography variant="h6" gutterBottom>
