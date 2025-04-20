@@ -61,6 +61,49 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   }
 });
 
+// Search for a book by book and author id
+router.get(
+  '/:bookId',
+  param('bookId').isInt({ min: 1 }),
+  query('authorId').isInt({ min: 1 }),
+  async (req, res) => {
+    const vResult = validationResult(req);
+
+    // If no query, return all books
+    if (!vResult.isEmpty()) {
+      res.status(400).json({ error: 'missing book id or author id' });
+      return;
+    }
+
+    const data = matchedData(req);
+    const searchByIdQuery = `
+      SELECT 
+      b.book_id, 
+      b.title, 
+      b.pdate, 
+      b.synopsis, 
+      a.aname AS author,
+      ARRAY_AGG(g.label) AS genres
+    FROM book b
+    JOIN author a ON b.author_id = a.author_id
+    LEFT JOIN genre g ON b.book_id = g.book_id
+    WHERE b.book_id = $1 AND a.author_id = $2
+    GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname;
+    `;
+
+    const result = await db.query(searchByIdQuery, [
+      data.bookId,
+      data.authorId,
+    ]);
+    if (result.rows.length === 0) {
+      res.sendStatus(404);
+    } else {
+      const rows = result.rows as Record<string, unknown>[];
+      res.send(rows);
+    }
+  },
+);
+
 // TODO: Put behind 'librarianConfirmation' middleware
 // Delete a book entirely from a library
 router.delete(
