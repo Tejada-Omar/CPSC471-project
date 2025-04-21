@@ -8,6 +8,7 @@ import {
   query,
   validationResult,
 } from 'express-validator';
+import { adminConfirmation, userConfirmation } from '../utils/middleware.js';
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
 // Use standard int parser for custom Rating
@@ -38,15 +39,69 @@ export function mapReviewResult(row: Record<string, unknown>): Review {
 
 const router = express.Router();
 
-router.get('/', async (_req, res) => {
-  const searchQuery = 'SELECT * FROM review';
-  const result = await db.query(searchQuery);
-  const rows = result.rows as Record<string, unknown>[];
-  res.send(rows.map((r) => mapReviewResult(r)));
-});
+// Get all reviews
+// No query parameters = all reviews
+// userId as query param = get all reviews by that user id
+// Both bookId and authorId as query params = get all reviews of that specific book (note that identifying a book requires both according to our db)
+router.get(
+  '/',
+  query(['bookId', 'authorId', 'userId']).isInt({ min: 1 }).optional(),
+  async (req, res) => {
+    const vResult = validationResult(req);
+
+    if (!vResult.isEmpty()) {
+      res.status(400).send('Invalid request parameters.');
+      return;
+    }
+
+    const data = matchedData(req, { includeOptionals: true });
+
+    let result;
+    if (data.bookId && data.authorId) {
+      // Case 1: Searching by both bookId and authorId (must be both provided)
+      const searchByBookAndAuthorQuery = `
+        SELECT r.review_id, u.uname AS reviewer, r.rating, r.body
+        FROM review r
+        JOIN users u ON r.user_id = u.user_id
+        WHERE r.book_id = $1 AND r.author_id = $2;
+      `;
+      result = await db.query(searchByBookAndAuthorQuery, [
+        data.bookId,
+        data.authorId,
+      ]);
+    } else if (data.userId) {
+      // Case 2: Searching by userId alone
+      const searchByUserQuery = `
+        SELECT r.review_id, u.uname AS reviewer, r.rating, r.body
+        FROM review r
+        JOIN users u ON r.user_id = u.user_id
+        WHERE u.user_id = $1;
+      `;
+      result = await db.query(searchByUserQuery, [data.userId]);
+    } else {
+      // Case 3: Returning all reviews if no filter parameters are provided
+      const searchQuery = `
+        SELECT r.review_id, u.uname AS reviewer, r.rating, r.body
+        FROM review r
+        JOIN users u ON r.user_id = u.user_id;
+      `;
+      result = await db.query(searchQuery);
+    }
+
+    // If no results are found, send a 404 response
+    if (result.rows.length === 0) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const rows = result.rows;
+
+    res.status(200).json(rows);
+  },
+);
 
 // TODO: Allow filtering by authorId
-router.get(
+/* router.get(
   '/:reviewId',
   param('reviewId').isInt({ min: 1 }),
   query(['bookId', 'userId']).isInt({ min: 1 }).optional(),
@@ -91,15 +146,20 @@ router.get(
 
     res.status(200).json(respBody);
   },
-);
+); */
 
+// Post a review to a book
+// It will use user id based on token
 router.post(
   '/',
-  body(['bookId', 'userId', 'authorId']).isInt({ min: 1 }),
+  body(['bookId', 'authorId']).isInt({ min: 1 }),
   body('rating').isInt({ min: 1, max: 5 }),
   body('body').trim(),
+  userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+    const userId = req.userId;
+
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
       return;
@@ -112,7 +172,7 @@ router.post(
       RETURNING *;
       `;
     const result = await db.query(insertReviewQuery, [
-      data.userId,
+      userId,
       data.rating,
       data.body,
       data.bookId,
@@ -128,11 +188,13 @@ router.post(
   },
 );
 
+// Edit a review
 router.put(
   '/:reviewId',
   param('reviewId').isInt({ min: 1 }),
   body('rating').isInt({ min: 1, max: 5 }).optional(),
   body('body').trim().optional({ values: 'falsy' }),
+  adminConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
@@ -170,10 +232,12 @@ router.put(
   },
 );
 
+// Delete a review
 router.delete(
   '/:reviewId',
   param('reviewId').isInt({ min: 1 }),
   query('userId').isInt({ min: 1 }),
+  adminConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
