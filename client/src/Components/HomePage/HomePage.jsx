@@ -115,7 +115,7 @@ const HomePage = () => {
       <Box id="homeHeaderBox">
         <Typography variant="h2">OneShelf</Typography>
         <Box id="homeButtonBox">
-          {console.log("IS ADMIN? :" + isAdmin)}
+          
           {authToken && isAdmin ? (
             <Button onClick={() => handleClick("/admin")}>
               Admin Dashboard
@@ -123,7 +123,7 @@ const HomePage = () => {
           ) : (
             <></>
           )}
-          {console.log("IS LIBRARIAN? :" + isLibrarian)}
+
           {authToken && isLibrarian ? (
             <Button onClick={() => handleClick("/librarian")}>
               Librarian Dashboard
