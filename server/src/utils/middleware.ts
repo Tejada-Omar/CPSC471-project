@@ -104,7 +104,7 @@ export const userConfirmation = roleConfirmation([
   'admin',
   'librarian',
 ]);
-export const librarianConfirmation = roleConfirmation(['admin', 'librarian']);
+export const librarianConfirmation = roleConfirmation(['librarian']);
 export const adminConfirmation = roleConfirmation(['admin']);
 
 // General error handler

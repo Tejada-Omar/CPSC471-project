@@ -1,6 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import * as db from '../db/index.js';
+import {
+  adminConfirmation,
+  librarianConfirmation,
+} from '../utils/middleware.js';
 
 const userRouter = express.Router();
 
@@ -105,6 +109,24 @@ userRouter.post(
 
       next(error);
     }
+  },
+);
+
+// Check if user is librarian
+userRouter.get(
+  '/checkLibrarian',
+  librarianConfirmation,
+  async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
+    return res.status(200).json({ message: 'successfully validated' });
+  },
+);
+
+// Check if user is admin
+userRouter.get(
+  '/checkAdmin',
+  adminConfirmation,
+  async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
+    return res.status(200).json({ message: 'successfully validated' });
   },
 );
 
