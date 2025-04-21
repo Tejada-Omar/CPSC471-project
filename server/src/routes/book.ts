@@ -104,15 +104,16 @@ router.get(
   },
 );
 
-// TODO: Put behind 'librarianConfirmation' middleware
 // Delete a book entirely from a library
+// Will only delete the book if it is from the same library as the librarian doing this request
 router.delete(
   '/:bookId',
   param('bookId').isInt({ min: 1 }),
-  query('libraryId').isInt({ min: 1 }),
   query('authorId').isInt({ min: 1 }),
+  librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+    const libraryId = req.libraryId;
     if (!vResult.isEmpty()) {
       res.status(400).send('Missing search parameters');
       return;
@@ -126,7 +127,7 @@ router.delete(
       `;
 
     const result = await db.query(deleteByIdQuery, [
-      data.libraryId,
+      libraryId,
       data.bookId,
       data.authorId,
     ]);
@@ -139,6 +140,7 @@ router.delete(
 );
 
 // Edit a book
+// Must be a librarian from the correct library to do this
 router.put(
   '/:bookId',
   param('bookId').isInt({ min: 1 }),
@@ -146,8 +148,13 @@ router.put(
   body('title').trim().notEmpty().optional(),
   body('publishedDate').isDate().optional(),
   body('synopsis').trim().optional({ values: 'falsy' }),
+  librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+
+    // From librarian auth middleware
+    const libraryId = req.libraryId;
+
     if (!vResult.isEmpty()) {
       res.status(400).send('Invalid request body sent');
       return;
@@ -165,11 +172,23 @@ router.put(
     const updateQuery = `
       UPDATE book
       SET ${queryValues}
-      WHERE book_id = $1 AND author_id = $2
+      WHERE book_id = $1
+        AND author_id = $2
+        AND EXISTS (
+          SELECT 1
+          FROM library_contains
+          WHERE book_id = $1
+            AND author_id = $2
+            AND library_id = $3
+        )
       RETURNING 'updated' AS status;
       `;
 
-    const result = await db.query(updateQuery, [data.bookId, data.authorId]);
+    const result = await db.query(updateQuery, [
+      data.bookId,
+      data.authorId,
+      libraryId,
+    ]);
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {
@@ -179,14 +198,18 @@ router.put(
 );
 
 // Create a new book in a library of a certain genre
+// Will create the book in the same library as the librarian doing this request
 router.post(
   '/',
-  body(['authorId', 'libraryId', 'noOfCopies']).isInt({ min: 1 }),
+  body(['authorId', 'noOfCopies']).isInt({ min: 1 }),
   body(['title', 'genre']).trim().notEmpty(),
   body('publishedDate').toDate(),
   body('synopsis').trim().optional({ values: 'falsy' }),
+  librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+    const libraryId = req.libraryId;
+
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
       return;
@@ -229,7 +252,7 @@ router.post(
         VALUES ($1, $2, $3, $4);
         `;
       await client.query(insertLibraryRelationQuery, [
-        data.libraryId,
+        libraryId,
         book.id,
         data.authorId,
         data.noOfCopies,

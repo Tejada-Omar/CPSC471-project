@@ -19,6 +19,7 @@ interface JwtPayload {
   username: string;
   id: number;
   role: role;
+  libraryId: number | null;
 }
 
 // Request body type
@@ -59,14 +60,16 @@ loginRouter.post(
       }
 
       let role: role = 'user';
+      let libraryId = null;
 
       const libraryResult = await db.query(
-        `SELECT 1 FROM librarian WHERE librarian_id = $1`,
+        `SELECT library_id FROM librarian WHERE librarian_id = $1`,
         [user.user_id.toString()],
       );
 
       if (libraryResult.rows.length > 0) {
         role = 'librarian';
+        libraryId = libraryResult.rows[0].library_id;
       }
 
       const adminResult = await db.query(
@@ -82,6 +85,7 @@ loginRouter.post(
         username: user.username,
         id: user.user_id,
         role,
+        libraryId,
       };
 
       const secret = process.env.SECRET;

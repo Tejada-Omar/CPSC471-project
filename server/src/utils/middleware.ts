@@ -12,6 +12,7 @@ declare global {
   namespace Express {
     interface Request {
       userId?: number;
+      libraryId?: number;
     }
   }
 }
@@ -21,6 +22,7 @@ interface JwtPayload {
   username: string;
   id: number;
   role: 'admin' | 'user' | 'librarian';
+  libraryId: number | null;
 }
 
 // Helper function to get the token from the Authorization header
@@ -43,6 +45,13 @@ const verifyTokenAndSetUserId = (
 
     if (!decodedToken.id || !validRoles.includes(decodedToken.role)) {
       return null; // Invalid role
+    }
+
+    // Make sure librarian has library id
+    if (validRoles.includes('librarian')) {
+      if (!decodedToken.libraryId) {
+        return null;
+      }
     }
 
     return decodedToken;
@@ -72,6 +81,12 @@ const roleConfirmation = (validRoles: string[]) => {
     }
 
     request.userId = decodedToken.id;
+
+    // For librarians, also add the library id
+    if (decodedToken.libraryId) {
+      request.libraryId = decodedToken.libraryId;
+    }
+
     next();
   };
 };
