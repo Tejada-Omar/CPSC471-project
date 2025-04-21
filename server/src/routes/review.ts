@@ -255,7 +255,6 @@ router.put(
 router.delete(
   '/:reviewId',
   param('reviewId').isInt({ min: 1 }),
-  query('userId').isInt({ min: 1 }).optional(),
   userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
