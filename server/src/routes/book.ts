@@ -80,11 +80,11 @@ router.get(
 
     const data = matchedData(req);
     const searchByIdQuery = `
-      SELECT 
-      b.book_id, 
-      b.title, 
-      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate, 
-      b.synopsis, 
+      SELECT
+      b.book_id,
+      b.title,
+      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
+      b.synopsis,
       a.aname AS author,
       ARRAY_AGG(g.label) AS genres
     FROM book b
