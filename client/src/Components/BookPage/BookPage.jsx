@@ -56,9 +56,9 @@ const BookPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleLoanRequest = (libraryId) => {
+  const handleLoanRequest = (library) => {
     const userResponse = confirm(
-      `Do you want to request a loan for ${book.title} by ${book.author_name} from ${libraryId}?`
+      `Do you want to request a loan for ${book.title} by ${book.author} from ${library.library_name}?`
     );
     if (userResponse) {
       alert("create loan request");
@@ -222,7 +222,7 @@ const BookPage = () => {
                   </Box>
                   {library.no_of_copies > 0 && authToken && (
                     <button
-                      onClick={() => handleLoanRequest(library.name)}
+                      onClick={() => handleLoanRequest(library)}
                       style={{
                         backgroundColor: "#1976d2",
                         color: "white",
