@@ -11,6 +11,7 @@ import {
   Rating,
 } from "@mui/material";
 import { API_URL } from "../../utils/constants";
+import ReviewDialog from "./Components/ReviewDialog";
 
 const BookPage = () => {
   const authToken = localStorage.getItem("authToken");
@@ -20,34 +21,35 @@ const BookPage = () => {
   const [reviewData, setReviewData] = useState([]);
   const [libraryData, setLibraryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        `${API_URL}/book/${bookId}?authorId=${authorId}`
+      );
+      const data = await response.json();
+      setBook(data[0]);
+
+      const reviewResponse = await fetch(
+        `${API_URL}/review?bookId=${bookId}&authorId=${authorId}`
+      );
+      const reviewDataTemp = await reviewResponse.json();
+      setReviewData(reviewDataTemp);
+
+      const libraryResponse = await fetch(
+        `${API_URL}/library/booklibs?bookId=${bookId}&authorId=${authorId}`
+      );
+      const libraryDataTemp = await libraryResponse.json();
+      setLibraryData(libraryDataTemp);
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    } finally {
+      setIsLoading(false); // Set loading to false when done
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `${API_URL}/book/${bookId}?authorId=${authorId}`
-        );
-        const data = await response.json();
-        setBook(data[0]);
-
-        const reviewResponse = await fetch(
-          `${API_URL}/review?bookId=${bookId}&authorId=${authorId}`
-        );
-        const reviewDataTemp = await reviewResponse.json();
-        setReviewData(reviewDataTemp);
-
-        const libraryResponse = await fetch(
-          `${API_URL}/library/booklibs?bookId=${bookId}&authorId=${authorId}`
-        );
-        const libraryDataTemp = await libraryResponse.json();
-        setLibraryData(libraryDataTemp);
-      } catch (err) {
-        console.error("Failed to fetch data:", err);
-      } finally {
-        setIsLoading(false); // Set loading to false when done
-      }
-    };
-
     fetchData();
   }, []);
 
@@ -66,6 +68,30 @@ const BookPage = () => {
   const averageRating =
     reviewData.reduce((sum, review) => sum + review.rating, 0) /
     reviewData.length;
+
+  const handleSubmit = async (data) => {
+    // Post review
+    try {
+      await fetch(`${API_URL}/review`, {
+        method: "POST",
+        body: JSON.stringify({
+          bookId,
+          authorId,
+          rating: data.rating,
+          body: data.reviewText,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (err) {
+      console.error("Failed to post review:", err);
+    }
+
+    fetchData();
+    setOpen(false); // close dialog
+  };
 
   if (isLoading) {
     return (
@@ -222,27 +248,34 @@ const BookPage = () => {
               Reviews
             </Typography>
             {authToken ? (
-              <Box display="flex" justifyContent="flex-end" mb={1}>
-                <button
-                  style={{
-                    padding: "8px 16px",
-                    backgroundColor: "#1976d2",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
+              <>
+                <Box display="flex" justifyContent="flex-end" mb={1}>
+                  <button
+                    style={{
+                      padding: "8px 16px",
+                      backgroundColor: "#1976d2",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontWeight: "bold",
+                    }}
+                    onClick={() => {
+                      // Placeholder action
+                      setOpen(true);
+                    }}
+                  >
+                    Leave a Review
+                  </button>
+                </Box>
+                <ReviewDialog
+                  open={open}
+                  onClose={() => setOpen(false)}
+                  onSubmit={(data) => {
+                    handleSubmit(data);
                   }}
-                  onClick={() => {
-                    // Placeholder action
-                    alert(
-                      "Redirect to review form, this button should prob only be visible to logged in users as well."
-                    );
-                  }}
-                >
-                  Leave a Review
-                </button>
-              </Box>
+                />
+              </>
             ) : (
               <></>
             )}
