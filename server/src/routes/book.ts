@@ -149,7 +149,7 @@ router.put(
   param('bookId').isInt({ min: 1 }),
   query('authorId').isInt({ min: 1 }),
   body('title').trim().notEmpty().optional(),
-  body('publishedDate').isDate().optional(),
+  body('publishedDate').isISO8601().toDate().optional(),
   body('synopsis').trim().optional({ values: 'falsy' }),
   librarianConfirmation,
   async (req, res) => {
@@ -206,7 +206,7 @@ router.post(
   '/',
   body(['authorId', 'noOfCopies']).isInt({ min: 1 }),
   body(['title', 'genre']).trim().notEmpty(),
-  body('publishedDate').toDate(),
+  body('publishedDate').isISO8601().toDate(),
   body('synopsis').trim().optional({ values: 'falsy' }),
   librarianConfirmation,
   async (req, res) => {
