@@ -1,6 +1,7 @@
 import express from 'express';
 import authorRouter from './routes/author.js';
 import bookRouters from './routes/book.js';
+import libraryRouter from './routes/library.js';
 import loginRouter from './routes/login.js';
 import reviewRouter from './routes/review.js';
 import userRouter from './routes/user.js';
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/author', authorRouter);
 app.use('/book', bookRouters);
+app.use('/library', libraryRouter);
 app.use('/login', loginRouter);
 app.use('/review', reviewRouter);
 app.use('/user', userRouter);

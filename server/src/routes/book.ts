@@ -17,6 +17,7 @@ export interface Book {
   title: string;
   publishedDate: Date;
   synopsis: string;
+  noOfCopies?: number;
 }
 
 export function mapBookResult(row: Record<string, unknown>): Book {
@@ -26,6 +27,8 @@ export function mapBookResult(row: Record<string, unknown>): Book {
     publishedDate: row.pdate as Date,
     synopsis: row.synopsis as string,
     title: row.title as string,
+    noOfCopies:
+      row.no_of_copies !== undefined ? (row.no_of_copies as number) : undefined,
   };
 }
 
