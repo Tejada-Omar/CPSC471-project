@@ -77,13 +77,13 @@ const AddBookPage = () => {
       let testGenre = "Sports";
       console.log(authorId, title, genres, publishingDate, synopsis, noOfCopies)
       
-      const response = await fetch(`${API_URL}/book/`, {
+      const response = await fetch(`${API_URL}/book`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({ authorId, title, genres, publishingDate, synopsis, noOfCopies }),
+        body: JSON.stringify({ authorId, title, genre: genres, publishedDate: publishingDate, synopsis, noOfCopies }),
       });
 
       const data = await response.json();
