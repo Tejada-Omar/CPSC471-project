@@ -40,7 +40,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   if (!vResult.isEmpty()) {
     const result = await db.query('SELECT * FROM book');
     const rows = result.rows as Record<string, unknown>[];
-    res.send(rows.map((r) => mapBookResult(r)));
+    res.json(rows.map((r) => mapBookResult(r)));
     return;
   }
 
@@ -60,7 +60,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
     res.sendStatus(404);
   } else {
     const rows = result.rows as Record<string, unknown>[];
-    res.send(rows.map((r) => mapBookResult(r)));
+    res.json(rows.map((r) => mapBookResult(r)));
   }
 });
 
