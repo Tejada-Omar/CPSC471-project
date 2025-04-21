@@ -12,94 +12,44 @@ import {
 } from "@mui/material";
 import { API_URL } from "../../utils/constants";
 
-import "./BookStyles.css";
-
 const BookPage = () => {
+  const authToken = localStorage.getItem("authToken");
+
   const { bookId, authorId } = useParams();
   const [book, setBook] = useState({});
   const [reviewData, setReviewData] = useState([]);
   const [libraryData, setLibraryData] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    /* const result = fetch(`${API_URL}/${bookId}?authorId=${authorId}`)
-      .then((res) => res.json())
-      .then((data) => setBook(data))
-      .catch((err) => console.error("Failed to fetch books:", err)); */
-    setBook(mockBook);
-    setReviewData(mockReviewData);
-    setLibraryData(mockLibraries);
-    setGenres(mockGenres);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/book/${bookId}?authorId=${authorId}`
+        );
+        const data = await response.json();
+        setBook(data[0]);
+
+        const reviewResponse = await fetch(
+          `${API_URL}/review?bookId=${bookId}&authorId=${authorId}`
+        );
+        const reviewDataTemp = await reviewResponse.json();
+        setReviewData(reviewDataTemp);
+
+        const libraryResponse = await fetch(
+          `${API_URL}/library/booklibs?bookId=${bookId}&authorId=${authorId}`
+        );
+        const libraryDataTemp = await libraryResponse.json();
+        setLibraryData(libraryDataTemp);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      } finally {
+        setIsLoading(false); // Set loading to false when done
+      }
+    };
+
+    fetchData();
   }, []);
-
-  const mockBook = {
-    book_id: 1,
-    author_id: 1,
-    author_name: "J. K. Rowling",
-    pdate: "1997-06-26",
-    title: "Harry Potter and the Philosopher's Stone",
-    synopsis:
-      "A young boy discovers he is a wizard and attends Hogwarts School of Witchcraft and Wizardry.",
-  };
-
-  const mockReviewData = [
-    {
-      review_id: 1,
-      user_id: 1,
-      rating: 5,
-      body: "An amazing book that captivates the reader from the start.",
-      book_id: 1,
-      author_id: 1,
-    },
-    {
-      review_id: 2,
-      user_id: 2,
-      rating: 4,
-      body: "A magical and imaginative story. Some parts felt a bit slow, but overall a great read.",
-      book_id: 1,
-      author_id: 1,
-    },
-    {
-      review_id: 3,
-      user_id: 3,
-      rating: 5,
-      body: "Loved the characters and the world-building. This book made me want to read the whole series!",
-      book_id: 1,
-      author_id: 1,
-    },
-    {
-      review_id: 4,
-      user_id: 1,
-      rating: 3,
-      body: "I liked the story, but it felt a bit too childish for my taste.",
-      book_id: 1,
-      author_id: 1,
-    },
-    {
-      review_id: 5,
-      user_id: 2,
-      rating: 4,
-      body: "A strong start to a legendary series. Hogwarts is such a fascinating place.",
-      book_id: 1,
-      author_id: 1,
-    },
-    {
-      review_id: 6,
-      user_id: 3,
-      rating: 5,
-      body: "Absolutely magical! I couldn't put it down.",
-      book_id: 1,
-      author_id: 1,
-    },
-  ];
-
-  const mockLibraries = [
-    { library_id: 101, name: "Downtown Public Library", copies: 3 },
-    { library_id: 102, name: "Northside Community Library", copies: 0 },
-    { library_id: 103, name: "University Library", copies: 5 },
-  ];
-
-  const mockGenres = ["Fantasy", "Adventure", "Young Adult"];
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -114,8 +64,29 @@ const BookPage = () => {
   };
 
   const averageRating =
-    mockReviewData.reduce((sum, review) => sum + review.rating, 0) /
-    mockReviewData.length;
+    reviewData.reduce((sum, review) => sum + review.rating, 0) /
+    reviewData.length;
+
+  if (isLoading) {
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        px={2}
+        py={4}
+        sx={{ backgroundColor: "#f9f9f9", minHeight: "100vh" }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            padding: isMobile ? 2 : 4,
+            width: isMobile ? "100%" : "60%",
+            maxWidth: "800px",
+          }}
+        ></Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -139,7 +110,7 @@ const BookPage = () => {
               {book.title}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              {book.author_name}
+              {book.author}
             </Typography>
           </Stack>
 
@@ -154,9 +125,6 @@ const BookPage = () => {
           <Box>
             <Typography variant="subtitle1" color="text.secondary">
               Book ID: {book.book_id}
-            </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              Author ID: {book.author_id}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
               Publication Date: {book.pdate}
@@ -174,7 +142,7 @@ const BookPage = () => {
           <Box>
             <Typography variant="h6">Genres</Typography>
             <Stack direction="row" spacing={2} mt={1} mb={4} flexWrap="wrap">
-              {genres.map((genre, index) => (
+              {book.genres.map((genre, index) => (
                 <Typography
                   key={index}
                   sx={{
@@ -219,12 +187,14 @@ const BookPage = () => {
                   sx={{ border: "1px solid #eee", borderRadius: 2 }}
                 >
                   <Box>
-                    <Typography variant="subtitle1">{library.name}</Typography>
+                    <Typography variant="subtitle1">
+                      {library.library_name}
+                    </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      Copies available: {library.copies}
+                      Copies available: {library.no_of_copies}
                     </Typography>
                   </Box>
-                  {library.copies > 0 && (
+                  {library.no_of_copies > 0 && authToken && (
                     <button
                       onClick={() => handleLoanRequest(library.name)}
                       style={{
@@ -251,32 +221,36 @@ const BookPage = () => {
             <Typography variant="h6" gutterBottom>
               Reviews
             </Typography>
-            <Box display="flex" justifyContent="flex-end" mb={1}>
-              <button
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#1976d2",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                }}
-                onClick={() => {
-                  // Placeholder action
-                  alert(
-                    "Redirect to review form, this button should prob only be visible to logged in users as well."
-                  );
-                }}
-              >
-                Leave a Review
-              </button>
-            </Box>
+            {authToken ? (
+              <Box display="flex" justifyContent="flex-end" mb={1}>
+                <button
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#1976d2",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                  }}
+                  onClick={() => {
+                    // Placeholder action
+                    alert(
+                      "Redirect to review form, this button should prob only be visible to logged in users as well."
+                    );
+                  }}
+                >
+                  Leave a Review
+                </button>
+              </Box>
+            ) : (
+              <></>
+            )}
 
             <Stack spacing={3}>
               {reviewData.map((review) => (
                 <Box
-                  key={review.review_id}
+                  key={`${review.review_id}-${review.reviewer}`}
                   p={2}
                   sx={{ border: "1px solid #eee", borderRadius: 2 }}
                 >
@@ -285,7 +259,7 @@ const BookPage = () => {
                     {review.body}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    — User #{review.user_id}
+                    — User {review.reviewer}
                   </Typography>
                 </Box>
               ))}

@@ -83,7 +83,7 @@ router.get(
       SELECT 
       b.book_id, 
       b.title, 
-      b.pdate, 
+      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate, 
       b.synopsis, 
       a.aname AS author,
       ARRAY_AGG(g.label) AS genres

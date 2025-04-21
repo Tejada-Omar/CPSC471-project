@@ -1,6 +1,12 @@
 import express from 'express';
 import * as db from '../db/index.js';
-import { body, matchedData, param, validationResult } from 'express-validator';
+import {
+  body,
+  matchedData,
+  param,
+  validationResult,
+  query,
+} from 'express-validator';
 import { mapBookResult } from './book.js';
 
 export interface Librarian {
@@ -25,6 +31,41 @@ router.get('/', async (_req, res) => {
   const rows = result.rows as Record<string, unknown>[];
   res.json(rows.map((r) => mapLibraryResult(r)));
 });
+
+// Get all libraries from a certain book and author
+router.get(
+  '/booklibs',
+  query('bookId').isInt({ min: 1 }),
+  query('authorId').isInt({ min: 1 }),
+  async (req, res) => {
+    const vResult = validationResult(req);
+    console.log('test');
+    if (!vResult.isEmpty()) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const data = matchedData(req);
+    const getBooksFromLibraryQuery = `
+      SELECT lib.library_id, lib.loc, lib.library_name, lc.no_of_copies
+      FROM library_contains lc
+      JOIN book b ON lc.book_id = b.book_id and lc.author_id = b.author_id
+      JOIN library lib ON lc.library_id = lib.library_id
+      WHERE b.book_id = $1 AND b.author_id = $2;
+      `;
+    const result = await db.query(getBooksFromLibraryQuery, [
+      data.bookId,
+      data.authorId,
+    ]);
+    if (result.rows.length === 0) {
+      res.sendStatus(404);
+      return;
+    }
+
+    const rows = result.rows as Record<string, unknown>[];
+    res.json(rows);
+  },
+);
 
 router.get(
   '/:libraryId',
