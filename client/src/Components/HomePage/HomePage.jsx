@@ -20,6 +20,8 @@ const HomePage = () => {
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLibrarian, setIsLibrarian] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -36,6 +38,56 @@ const HomePage = () => {
 
     fetchBooks();
   }, []);
+
+  useEffect(() => {
+    const fetchIsAdmin = async () => {
+      try {
+        const response = await fetch(`${API_URL}/user/checkAdmin`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.status === 200) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch admin status", err);
+        setIsAdmin(false);
+      }
+    };
+
+    fetchIsAdmin();
+  }, [authToken]);
+
+  useEffect(() => {
+    const fetchIsLibrarian = async () => {
+      try {
+        const response = await fetch(`${API_URL}/user/checkLibrarian`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const data = await response.json();
+
+        if (response.status === 200) {
+          setIsLibrarian(true);
+        } else {
+          setIsLibrarian(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch librarian status", err);
+        setIsLibrarian(false);
+      }
+    };
+
+    fetchIsLibrarian();
+  }, [authToken]);
 
   const handleClick = (url) => {
     navigate(url);
@@ -63,10 +115,29 @@ const HomePage = () => {
       <Box id="homeHeaderBox">
         <Typography variant="h2">OneShelf</Typography>
         <Box id="homeButtonBox">
-          <Button onClick={() => handleClick("/librarian")}>
-            Librarian Dashboard
-          </Button>
-          <Button onClick={() => handleClick("/admin")}>Admin Dashboard</Button>
+          {console.log("IS ADMIN? :" + isAdmin)}
+          {authToken && isAdmin ? (
+            <Button onClick={() => handleClick("/admin")}>
+              Admin Dashboard
+            </Button>
+          ) : (
+            <></>
+          )}
+          {console.log("IS LIBRARIAN? :" + isLibrarian)}
+          {authToken && isLibrarian ? (
+            <Button onClick={() => handleClick("/librarian")}>
+              Librarian Dashboard
+            </Button>
+          ) : (
+            <></>
+          )}
+
+          {authToken ? (
+            <Button onClick={() => handleClick("/user")}>User Dashboard</Button>
+          ) : (
+            <></>
+          )}
+
           {authToken ? (
             <Button onClick={handleSignOut}>Sign out</Button>
           ) : (
