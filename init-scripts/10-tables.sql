@@ -95,6 +95,16 @@ create table monitors_user (
   foreign key (user_id) references users (user_id)
 );
 
+create table loan_request (
+  loan_id int not null,
+  user_id int not null,
+  book_id int not null,
+  author_id int not null,
+  foreign key (loan_id, user_id) references loan (loan_id, user_id),
+  foreign key (book_id, author_id) references book (book_id, author_id),
+  primary key (loan_id, user_id, book_id, author_id)
+);
+
 create table loan_book (
   loan_id int not null,
   user_id int not null,

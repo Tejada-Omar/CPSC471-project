@@ -80,11 +80,11 @@ router.get(
 
     const data = matchedData(req);
     const searchByIdQuery = `
-      SELECT 
-      b.book_id, 
-      b.title, 
-      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate, 
-      b.synopsis, 
+      SELECT
+      b.book_id,
+      b.title,
+      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
+      b.synopsis,
       a.aname AS author,
       ARRAY_AGG(g.label) AS genres
     FROM book b
@@ -149,7 +149,7 @@ router.put(
   param('bookId').isInt({ min: 1 }),
   query('authorId').isInt({ min: 1 }),
   body('title').trim().notEmpty().optional(),
-  body('publishedDate').isDate().optional(),
+  body('publishedDate').isISO8601().toDate().optional(),
   body('synopsis').trim().optional({ values: 'falsy' }),
   librarianConfirmation,
   async (req, res) => {
@@ -206,7 +206,7 @@ router.post(
   '/',
   body(['authorId', 'noOfCopies']).isInt({ min: 1 }),
   body(['title', 'genre']).trim().notEmpty(),
-  body('publishedDate').toDate(),
+  body('publishedDate').isISO8601().toDate(),
   body('synopsis').trim().optional({ values: 'falsy' }),
   librarianConfirmation,
   async (req, res) => {
