@@ -74,13 +74,16 @@ const AddBookPage = () => {
 
   const handleAddBook = async () => {
     try {
+      let testGenre = "Sports";
+      console.log(authorId, noOfCopies, title, testGenre, publishingDate, synopsis)
+      
       const response = await fetch(`${API_URL}/book/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({ authorId, noOfCopies, title, genres, publishingDate, synopsis }),
+        body: JSON.stringify({ authorId, noOfCopies, title, testGenre, publishingDate, synopsis }),
       });
 
       const data = await response.json();
@@ -94,7 +97,7 @@ const AddBookPage = () => {
       setError("");
     } catch (error) {
       setError(
-        "Could not add book successfully. Check fields and try again."
+        "Could not add book successfully. Check fields and try again. :" + error.message
       );
       setSuccess("");
     }
