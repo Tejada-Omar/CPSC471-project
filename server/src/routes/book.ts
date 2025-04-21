@@ -208,6 +208,16 @@ router.post(
   body(['title', 'genre']).trim().notEmpty(),
   body('publishedDate').isISO8601().toDate(),
   body('synopsis').trim().optional({ values: 'falsy' }),
+  body('genre')
+    .isArray()
+    .withMessage('Genre must be an array')
+    .bail()
+    .custom((value: any) => {
+      if (value.some((g: any) => typeof g !== 'string' || g.trim() === '')) {
+        throw new Error('Each genre must be a non-empty string');
+      }
+      return true;
+    }),
   librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
@@ -224,11 +234,12 @@ router.post(
     try {
       await client.query('BEGIN');
 
+      // Insert book
       const insertBookQuery = `
         INSERT INTO book (author_id, pdate, synopsis, title)
         VALUES ($1, $2, $3, $4)
         RETURNING *;
-        `;
+      `;
       const fResult = await client.query(insertBookQuery, [
         data.authorId,
         data.publishedDate,
@@ -240,20 +251,20 @@ router.post(
         (fResult.rows as Record<string, unknown>[])[0],
       );
 
+      // Insert multiple genres
       const insertGenreQuery = `
         INSERT INTO genre (book_id, author_id, label)
         VALUES ($1, $2, $3);
-        `;
-      await client.query(insertGenreQuery, [
-        book.id,
-        data.authorId,
-        data.genre,
-      ]);
+      `;
+      for (const genre of data.genre as string[]) {
+        await client.query(insertGenreQuery, [book.id, data.authorId, genre]);
+      }
 
+      // Insert book-library relation
       const insertLibraryRelationQuery = `
         INSERT INTO library_contains (library_id, book_id, author_id, no_of_copies)
         VALUES ($1, $2, $3, $4);
-        `;
+      `;
       await client.query(insertLibraryRelationQuery, [
         libraryId,
         book.id,
