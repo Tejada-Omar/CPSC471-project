@@ -75,7 +75,7 @@ const AddBookPage = () => {
   const handleAddBook = async () => {
     try {
       let testGenre = "Sports";
-      console.log(authorId, noOfCopies, title, testGenre, publishingDate, synopsis)
+      console.log(authorId, title, genres, publishingDate, synopsis, noOfCopies)
       
       const response = await fetch(`${API_URL}/book/`, {
         method: "POST",
@@ -83,7 +83,7 @@ const AddBookPage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({ authorId, noOfCopies, title, testGenre, publishingDate, synopsis }),
+        body: JSON.stringify({ authorId, title, genres, publishingDate, synopsis, noOfCopies }),
       });
 
       const data = await response.json();
