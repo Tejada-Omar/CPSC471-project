@@ -2,6 +2,10 @@ import express from 'express';
 import * as db from '../db/index.js';
 import { body, matchedData, param, validationResult } from 'express-validator';
 import { mapBookResult } from './book.js';
+import {
+  adminConfirmation,
+  librarianConfirmation,
+} from '../utils/middleware.js';
 
 export interface Author {
   id: number;
@@ -91,6 +95,7 @@ router.get(
 router.post(
   '/',
   body(['name', 'biography']).trim().notEmpty(),
+  librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
@@ -121,6 +126,7 @@ router.post(
 router.delete(
   '/:authorId',
   param('authorId').isInt({ min: 1 }),
+  adminConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
