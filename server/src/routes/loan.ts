@@ -312,7 +312,7 @@ router.patch(
 router.delete(
   '/:loanId',
   param('loanId').isInt({ min: 1 }),
-  body(['bookId', 'authorId', 'libraryId']).isInt({ min: 1 }),
+  body(['bookId', 'authorId']).isInt({ min: 1 }),
   userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
@@ -326,16 +326,39 @@ router.delete(
     const client = await db.getClient();
     try {
       const loanParams = [data.loanId, userId, data.bookId, data.authorId];
-      const copiesParams = [data.libraryId, data.bookId, data.authorId];
 
       await client.query('BEGIN');
+
+      const getLibraryIdQuery = `
+        SELECT library_id
+        FROM librarian
+        WHERE librarian_id = (
+          SELECT librarian_id
+          FROM loan
+          WHERE loan_id = $1 AND user_id = $2
+        );
+        `;
+      let result = await client.query(getLibraryIdQuery, [data.loanId, userId]);
+      if (result.rows.length === 0) {
+        await client.query('ROLLBACK');
+        res.sendStatus(404);
+        return;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      } else if (result.rows[0].library_id === null) {
+        await client.query('ROLLBACK');
+        res.sendStatus(409);
+        return;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const libraryId = result.rows[0].library_id as number;
+      const copiesParams = [libraryId, data.bookId, data.authorId];
 
       const removeLoanReqQuery = `
         DELETE FROM loan_book
         WHERE loan_id = $1 AND user_id = $2 AND book_id = $3 AND author_id = $4
         RETURNING 'deleted' AS status;
         `;
-      let result = await client.query(removeLoanReqQuery, loanParams);
+      result = await client.query(removeLoanReqQuery, loanParams);
       if (result.rows.length === 0) {
         await client.query('ROLLBACK');
         res.sendStatus(404);
