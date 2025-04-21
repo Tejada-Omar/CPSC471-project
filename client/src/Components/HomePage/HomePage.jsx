@@ -14,6 +14,8 @@ import { API_URL } from "../../utils/constants";
 import "./HomeStyles.css";
 
 const HomePage = () => {
+  const authToken = localStorage.getItem("authToken");
+
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -47,6 +49,11 @@ const HomePage = () => {
     book.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleSignOut = () => {
+    localStorage.clear();
+    location.reload();
+  };
+
   if (isLoading) {
     return <>loading...</>;
   }
@@ -60,7 +67,11 @@ const HomePage = () => {
             Librarian Dashboard
           </Button>
           <Button onClick={() => handleClick("/admin")}>Admin Dashboard</Button>
-          <Button onClick={() => handleClick("/login")}>Login</Button>
+          {authToken ? (
+            <Button onClick={handleSignOut}>Sign out</Button>
+          ) : (
+            <Button onClick={() => handleClick("/login")}>Login</Button>
+          )}
         </Box>
       </Box>
 

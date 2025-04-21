@@ -10,6 +10,7 @@ import {
   Divider,
   Rating,
 } from "@mui/material";
+import { API_URL } from "../../utils/constants";
 
 import "./BookStyles.css";
 
@@ -21,7 +22,7 @@ const BookPage = () => {
   const [genres, setGenres] = useState([]);
 
   useEffect(() => {
-    /* fetch(`${API_URL}/<something>`)
+    /* const result = fetch(`${API_URL}/${bookId}?authorId=${authorId}`)
       .then((res) => res.json())
       .then((data) => setBook(data))
       .catch((err) => console.error("Failed to fetch books:", err)); */
