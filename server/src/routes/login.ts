@@ -88,6 +88,8 @@ loginRouter.post(
         libraryId,
       };
 
+      console.log(userForToken);
+
       const secret = process.env.SECRET;
       if (!secret) {
         throw new Error('JWT secret is not defined in environment variables.');

@@ -194,9 +194,13 @@ router.put(
   param('reviewId').isInt({ min: 1 }),
   body('rating').isInt({ min: 1, max: 5 }).optional(),
   body('body').trim().optional({ values: 'falsy' }),
-  adminConfirmation,
+  userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+
+    const role = req.role;
+    const userId = req.userId;
+
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
       return;
@@ -217,13 +221,28 @@ router.put(
     queryValues = queryValues.slice(0, -1);
     queryParams.push(data.reviewId);
 
-    const editReviewQuery = `
-    UPDATE review
-    SET ${queryValues}
-    WHERE review_id = $${queryParams.length}
-    RETURNING 'updated' AS status;
-    `;
-    const result = await db.query(editReviewQuery, queryParams);
+    let editReviewQuery;
+    let result;
+
+    if (role === 'admin') {
+      editReviewQuery = `
+        UPDATE review
+        SET ${queryValues}
+        WHERE review_id = $${queryParams.length}
+        RETURNING 'updated' AS status;
+      `;
+      result = await db.query(editReviewQuery, queryParams);
+    } else {
+      editReviewQuery = `
+        UPDATE review
+        SET ${queryValues}
+        WHERE review_id = $${queryParams.length} AND user_id = $${queryParams.length + 1}
+        RETURNING 'updated' AS status;
+      `;
+      queryParams.push(userId);
+      result = await db.query(editReviewQuery, queryParams);
+    }
+
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {
@@ -236,8 +255,8 @@ router.put(
 router.delete(
   '/:reviewId',
   param('reviewId').isInt({ min: 1 }),
-  query('userId').isInt({ min: 1 }),
-  adminConfirmation,
+  query('userId').isInt({ min: 1 }).optional(),
+  userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
     if (!vResult.isEmpty()) {
@@ -245,13 +264,30 @@ router.delete(
       return;
     }
 
+    const role = req.role;
+    const userId = req.userId;
+
     const data = matchedData(req);
-    const deleteQuery = `
+
+    let deleteQuery;
+    let result;
+
+    if (role === 'admin') {
+      deleteQuery = `
+      DELETE FROM review
+      WHERE review_id = $1
+      RETURNING 'deleted' AS status;
+      `;
+      result = await db.query(deleteQuery, [data.reviewId]);
+    } else {
+      deleteQuery = `
       DELETE FROM review
       WHERE review_id = $1 AND user_id = $2
       RETURNING 'deleted' AS status;
       `;
-    const result = await db.query(deleteQuery, [data.reviewId, data.userId]);
+      result = await db.query(deleteQuery, [data.reviewId, userId]);
+    }
+
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {

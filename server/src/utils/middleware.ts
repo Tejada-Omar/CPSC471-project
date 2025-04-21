@@ -13,6 +13,7 @@ declare global {
     interface Request {
       userId?: number;
       libraryId?: number;
+      role?: string;
     }
   }
 }
@@ -48,7 +49,7 @@ const verifyTokenAndSetUserId = (
     }
 
     // Make sure librarian has library id
-    if (validRoles.includes('librarian')) {
+    if (decodedToken.role === 'librarian') {
       if (!decodedToken.libraryId) {
         return null;
       }
@@ -67,6 +68,7 @@ const roleConfirmation = (validRoles: string[]) => {
     const token = getTokenFromHeader(authorization);
 
     if (!token) {
+      console.log('Authorization header is missing or invalid');
       return next(
         new jwt.JsonWebTokenError('Authorization header is missing or invalid'),
       );
@@ -75,6 +77,7 @@ const roleConfirmation = (validRoles: string[]) => {
     const decodedToken = verifyTokenAndSetUserId(token, validRoles);
 
     if (!decodedToken) {
+      console.log('Invalid token or insufficient role');
       return next(
         new jwt.JsonWebTokenError('Invalid token or insufficient role'),
       );
@@ -85,6 +88,10 @@ const roleConfirmation = (validRoles: string[]) => {
     // For librarians, also add the library id
     if (decodedToken.libraryId) {
       request.libraryId = decodedToken.libraryId;
+    }
+
+    if (decodedToken.role === 'admin') {
+      request.role = decodedToken.role;
     }
 
     next();
