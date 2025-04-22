@@ -71,6 +71,7 @@ router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
   const searchByTitleQuery = `
     SELECT
       b.book_id,
+      b.author_id,
       b.title,
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
       b.synopsis,
@@ -81,7 +82,7 @@ router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
     LEFT JOIN genre g ON b.book_id = g.book_id
     JOIN library_contains lc ON lc.book_id = b.book_id AND lc.author_id = b.author_id
     WHERE lc.library_id = $1
-    GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname;
+    GROUP BY b.book_id, b.author_id, b.title, b.pdate, b.synopsis, a.aname;
     `;
 
   const result = await db.query(searchByTitleQuery, [libraryId.toString()]);
@@ -166,7 +167,7 @@ router.delete(
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {
-      res.sendStatus(204);
+      res.status(200).json({ success: true, message: "Book deleted" });
     }
   },
 );

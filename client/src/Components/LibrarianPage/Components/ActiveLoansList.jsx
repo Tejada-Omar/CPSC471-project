@@ -66,6 +66,7 @@ const PendingLoansList = ({ title }) => {
               <CardContent>
                 <Stack spacing={2}>
                   <Typography variant="h6">Loan ID: {loan.loan_id}</Typography>
+                  <Typography variant="h6">User ID: {loan.user_id}</Typography>
                   <Typography variant="h6">
                     Book Title: {loan.title}
                   </Typography>

@@ -8,8 +8,9 @@ import {
   Typography,
   Paper,
 } from "@mui/material";
-import { API_URL } from "../../utils/constants";
+
 import PendingLoansList from "./Components/PendingLoansList";
+import ActiveLoansList from "./Components/ActiveLoansList";
 
 import "./LibrarianStyles.css";
 
@@ -53,11 +54,7 @@ const LibrarianPage = () => {
         elevation={3}
         sx={{ padding: 5, borderRadius: 2, boxShadow: 3, mt: 3, paddingTop: 1 }}
       >
-        <Box class="librarianSection">
-          <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-            Active Loans
-          </Typography>
-        </Box>
+        <ActiveLoansList title={"Active Loans"}></ActiveLoansList>
 
         <PendingLoansList title={"Pending Loans"}></PendingLoansList>
       </Paper>

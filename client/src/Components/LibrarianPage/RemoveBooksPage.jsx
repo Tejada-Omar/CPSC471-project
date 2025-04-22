@@ -30,7 +30,14 @@ const RemoveBooksPage = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch(`${API_URL}/book`);
+        const response = await fetch(`${API_URL}/book/libraryBooks`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
         const data = await response.json();
         setBooks(data);
       } catch (err) {
@@ -52,9 +59,10 @@ const RemoveBooksPage = () => {
   const handleRemoveBook = async () => {
     setBookError("");
     setBookSuccess("");
+    console.log(selectedBook)
     try {
       const response = await fetch(
-        `${API_URL}/book/${selectedBook.id}?authorId=${selectedBook.authorId}`,
+        `${API_URL}/book/${selectedBook.book_id}?authorId=${selectedBook.author_id}`,
         {
           method: "DELETE",
           headers: {
@@ -63,7 +71,7 @@ const RemoveBooksPage = () => {
         }
       );
 
-      console.log(selectedBook.id, selectedBook.authorId);
+      console.log(selectedBook.book_id, selectedBook.author_id);
       const data = await response.json();
 
       if (!response.ok) {

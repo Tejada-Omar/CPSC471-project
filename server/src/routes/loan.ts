@@ -229,6 +229,8 @@ router.get('/activeLoans', librarianConfirmation, async (req, res) => {
       SELECT *
       FROM loan_book lr
       JOIN library_contains lc ON lr.book_id = lc.book_id AND lr.author_id = lc.author_id
+      JOIN book b ON lr.book_id = b.book_id AND lr.author_id = b.author_id
+      JOIN loan l ON lr.loan_id = l.loan_id AND lr.user_id = l.user_id
       WHERE lc.library_id = $1;
       `;
   const result = await db.query(getLoansForUserQuery, [libraryId.toString()]);
