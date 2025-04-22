@@ -91,7 +91,7 @@ const UserPage = () => {
 
       <Paper
         elevation={3}
-        sx={{ padding: 5, borderRadius: 2, boxShadow: 3, mt: 3 }}
+        sx={{ padding: 5, borderRadius: 2, boxShadow: 3, mt: 3, paddingTop: 1 }}
       >
         <LoansList title={"My Current Loans"} isApproved={true} />
         <LoansList title={"My Requested Loans"} isApproved={false} />

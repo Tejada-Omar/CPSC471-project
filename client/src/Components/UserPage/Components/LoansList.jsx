@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Stack,
-  Typography,
-  Card,
-  CardContent,
-} from "@mui/material";
+import { Stack, Typography, Card, CardContent, Box } from "@mui/material";
 import { API_URL } from "../../../utils/constants";
 
 import "../UserStyles.css";
@@ -25,7 +20,7 @@ const LoansList = ({ title, isApproved }) => {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        },
+        }
       );
 
       const loanData = await loanResponse.json();
@@ -53,72 +48,74 @@ const LoansList = ({ title, isApproved }) => {
 
   return (
     <>
-      <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-        {title}
-      </Typography>
+      <Box mt={5}>
+        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
+          {title}
+        </Typography>
 
-      {/* Generate a card for each loan */}
-      {loanData.map((loan, index) => {
-        const overdue = isOverdue(loan.loan.retDate); // Check if the loan is overdue
+        {/* Generate a card for each loan */}
+        {loanData.map((loan, index) => {
+          const overdue = isOverdue(loan.loan.retDate); // Check if the loan is overdue
 
-        return (
-          <Card
-            key={loan.loan.id}
-            sx={{
-              mt: 2,
-              p: 2,
-              backgroundColor: overdue ? "#ffe6e6" : "white", // Slightly red tint for overdue loans
-              border: overdue ? "1px solid red" : "1px solid grey",
-              boxShadow: 2,
-              borderRadius: 2,
-            }}
-          >
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant="h6">Loan ID: {loan.loan.id}</Typography>
-                <Typography variant="h6">
-                  Book Title: {loan.book.title}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Synopsis:</strong> {loan.book.synopsis}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Loan Start Date:</strong>{" "}
-                  {new Date(loan.loan.startDate).toLocaleDateString()}
-                </Typography>
-                <Typography variant="body1">
-                  <strong>Return Date:</strong>{" "}
-                  {new Date(loan.loan.retDate).toLocaleDateString()}
-                </Typography>
-                {overdue && (
-                  <Typography
-                    variant="body2"
-                    color="red"
-                    sx={{ fontStyle: "italic" }}
-                  >
-                    This loan is overdue!
+          return (
+            <Card
+              key={loan.loan.id}
+              sx={{
+                mt: 2,
+                p: 2,
+                backgroundColor: overdue ? "#ffe6e6" : "white", // Slightly red tint for overdue loans
+                border: overdue ? "1px solid red" : "1px solid grey",
+                boxShadow: 2,
+                borderRadius: 2,
+              }}
+            >
+              <CardContent>
+                <Stack spacing={2}>
+                  <Typography variant="h6">Loan ID: {loan.loan.id}</Typography>
+                  <Typography variant="h6">
+                    Book Title: {loan.book.title}
                   </Typography>
-                )}
+                  <Typography variant="body1">
+                    <strong>Synopsis:</strong> {loan.book.synopsis}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Loan Start Date:</strong>{" "}
+                    {new Date(loan.loan.startDate).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Return Date:</strong>{" "}
+                    {new Date(loan.loan.retDate).toLocaleDateString()}
+                  </Typography>
+                  {overdue && (
+                    <Typography
+                      variant="body2"
+                      color="red"
+                      sx={{ fontStyle: "italic" }}
+                    >
+                      This loan is overdue!
+                    </Typography>
+                  )}
 
-                {/* "Return Book" Button */}
-                {isApproved ? (
-                  <ReturnButton
-                    loan={loan}
-                    authToken={authToken}
-                    fetchData={fetchData}
-                  />
-                ) : (
-                  <CancelButton
-                    loan={loan}
-                    authToken={authToken}
-                    fetchData={fetchData}
-                  />
-                )}
-              </Stack>
-            </CardContent>
-          </Card>
-        );
-      })}
+                  {/* "Return Book" Button */}
+                  {isApproved ? (
+                    <ReturnButton
+                      loan={loan}
+                      authToken={authToken}
+                      fetchData={fetchData}
+                    />
+                  ) : (
+                    <CancelButton
+                      loan={loan}
+                      authToken={authToken}
+                      fetchData={fetchData}
+                    />
+                  )}
+                </Stack>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </Box>
     </>
   );
 };

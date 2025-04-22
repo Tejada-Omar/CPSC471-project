@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import { API_URL } from "../../utils/constants";
 import ReviewDialog from "./Components/ReviewDialog";
+import { Link } from "react-router-dom";
 
 const BookPage = () => {
   const authToken = localStorage.getItem("authToken");
@@ -90,7 +91,6 @@ const BookPage = () => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        const data = await response.json();
 
         if (response.status === 201) {
           alert(`Created loan request for ${book.title}`);
@@ -174,9 +174,20 @@ const BookPage = () => {
             <Typography variant="h4" component="h1">
               {book.title}
             </Typography>
-            <Typography variant="subtitle1" color="text.secondary">
-              {book.author}
-            </Typography>
+            <Link to={`/author/${authorId}`} style={{ textDecoration: "none" }}>
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                sx={{
+                  "&:hover": {
+                    color: "primary.main",
+                    cursor: "pointer",
+                  },
+                }}
+              >
+                {book.author}
+              </Typography>
+            </Link>
           </Stack>
 
           {/* Average Rating */}
