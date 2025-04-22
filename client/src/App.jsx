@@ -4,6 +4,7 @@ import HomePage from "./Components/HomePage/HomePage";
 import SignUpPage from "./Components/SignUpPage/SignUpPage";
 import AdminPage from "./Components/AdminPage/AdminPage";
 import LibrarianPage from "./Components/LibrarianPage/LibrarianPage";
+import ManageLibrariansPage from "./Components/LibrarianPage/ManageLibrariansPage";
 import UserPage from "./Components/UserPage/UserPage";
 import BookPage from "./Components/BookPage/BookPage";
 import AddBookPage from "./Components/LibrarianPage/AddBookPage"
@@ -12,6 +13,7 @@ import RemoveBooksPage from "./Components/LibrarianPage/RemoveBooksPage"
 import AddLibraryPage from "./Components/AdminPage/AddLibraryPage"
 import AuthorPage from "./Components/AuthorPage/AuthorPage";
 import LibraryPage from "./Components/LibraryPage/LibraryPage";
+
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
           <Route path="/addAuthor" element={<AddAuthorPage></AddAuthorPage>}></Route>
           <Route path="/addLibrary" element={<AddLibraryPage></AddLibraryPage>}></Route>
           <Route path="/removeBooks" element={<RemoveBooksPage></RemoveBooksPage>}></Route>
+          <Route path="/manageLibrarians" element={<ManageLibrariansPage></ManageLibrariansPage>}></Route>
+
         </Routes>
       </BrowserRouter>
     </>

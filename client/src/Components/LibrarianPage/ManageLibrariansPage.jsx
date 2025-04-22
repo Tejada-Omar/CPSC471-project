@@ -20,7 +20,7 @@ const ManageLibrariansPage = () => {
 
   const [users, setUsers] = useState([]);
 
-  const [selectedUser, setSelectedUser] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState(0);
 
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
 
@@ -59,19 +59,20 @@ const ManageLibrariansPage = () => {
   const handleAddLibrarian = async () => {
     setUserError("");
     setUserSuccess("");
-    console.log(selectedUser)
+    console.log(selectedUserId)
     try {
       const response = await fetch(
         `${API_URL}/user/librarian`,
         {
-          method: "DELETE",
+          method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
+          body: JSON.stringify({selectedUserId}),
         }
       );
 
-      console.log(selectedUser.user_id, selectedUser.author_id);
+      console.log(selectedUserId);
       const data = await response.json();
 
       if (!response.ok) {
@@ -117,11 +118,11 @@ const ManageLibrariansPage = () => {
               <InputLabel>User</InputLabel>
               <Select
                 label="User"
-                onChange={(event) => setSelectedUser(event.target.value)}
+                onChange={(event) => setSelectedUserId(event.target.value)}
               >
                 {users.map((user) => (
-                  <MenuItem key={user.id} value={user}>
-                    {user.title}
+                  <MenuItem key={user.user_id} value={user.user_id}>
+                    {user.uname}
                   </MenuItem>
                 ))}
               </Select>
