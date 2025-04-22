@@ -80,7 +80,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   const data = matchedData(req);
   const searchByTitleQuery = `
     SELECT b.book_id, b.title, b.pdate, b.synopsis, a.aname AS author,
-      STRING_AGG(g.label, ', ') AS genres
+      COALESCE(STRING_AGG(g.label, ', '), '') AS genres
     FROM book b
     JOIN author a USING (author_id)
     LEFT JOIN genre g USING (book_id)
@@ -109,7 +109,7 @@ router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
       b.synopsis,
       a.aname AS author,
-      ARRAY_AGG(g.label) AS genres
+      COALESCE(ARRAY_AGG(g.label), '{}') AS genres
     FROM book b
     JOIN author a ON b.author_id = a.author_id
     LEFT JOIN genre g ON b.book_id = g.book_id
@@ -149,7 +149,7 @@ router.get(
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
       b.synopsis,
       a.aname AS author,
-      ARRAY_AGG(g.label) AS genres
+      COALESCE(ARRAY_AGG(g.label), '{}') AS genres
     FROM book b
     JOIN author a USING (author_id)
     LEFT JOIN genre g ON b.book_id = g.book_id
