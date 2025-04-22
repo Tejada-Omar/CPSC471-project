@@ -41,7 +41,6 @@ const SignUpPage = () => {
     setError("");
 
     try {
-      console.log(`in the error: username: ${username}, password: ${password}, phonenum: ${pNo}, confirm: ${confirmPassword}`);
       const response = await fetch(`${API_URL}/user/createUser`, {
         method: "POST",
         headers: {
@@ -80,7 +79,7 @@ const SignUpPage = () => {
           <TextField
             required
             id="signUpPhone"
-            label="Phone Number - Ex. +1234567890"
+            label="Phone Number - Ex. 1234567890"
             variant="standard"
             onChange={(event) => setPNo(event.target.value)}
           />

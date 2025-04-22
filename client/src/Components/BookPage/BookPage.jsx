@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import {
   Box,
@@ -17,6 +18,7 @@ import { Link } from "react-router-dom";
 
 const BookPage = () => {
   const authToken = localStorage.getItem("authToken");
+  const navigate = useNavigate();
 
   const { bookId, authorId } = useParams();
   const [book, setBook] = useState({});
@@ -24,6 +26,10 @@ const BookPage = () => {
   const [libraryData, setLibraryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
+
+  const handleClick = (url) => {
+    navigate(url);
+  };
 
   const fetchData = async () => {
     try {
@@ -171,9 +177,13 @@ const BookPage = () => {
       >
         <Stack spacing={3}>
           <Stack spacing={0}>
-            <Typography variant="h4" component="h1">
-              {book.title}
-            </Typography>
+            <Box sx={{display:"flex", justifyContent:"space-between"}}>
+              <Typography variant="h4" component="h1">
+                {book.title}
+              </Typography>
+              <Button onClick={() => handleClick("/")}>Return to Home</Button>
+            </Box>
+
             <Link to={`/author/${authorId}`} style={{ textDecoration: "none" }}>
               <Typography
                 variant="subtitle1"
