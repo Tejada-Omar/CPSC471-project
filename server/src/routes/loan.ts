@@ -12,6 +12,12 @@ import {
   userConfirmation,
 } from '../utils/middleware.js';
 import { mapBookResult } from './book.js';
+import { Pool, PoolClient } from 'pg';
+import { DbError } from '../utils/errors.js';
+import {
+  decrementBookCopies,
+  incrementBookCopies,
+} from '../utils/book-copies.js';
 
 export interface Loan {
   id: number;
@@ -48,6 +54,49 @@ export function mapLoanReqResult(row: Record<string, unknown>): LoanRequest {
   };
 }
 
+async function removeLoanReq(
+  approved: boolean,
+  client: PoolClient,
+  data: { loanId: number; bookId: number; authorId: number; userId: number },
+) {
+  const removeLoanReqQuery = `
+    DELETE FROM ${approved ? 'loan_book' : 'loan_request'}
+    WHERE loan_id = $1 AND user_id = $2 AND book_id = $3 AND author_id = $4
+    RETURNING 'deleted' AS status;
+    `;
+  const result = await client.query(removeLoanReqQuery, [
+    data.loanId,
+    data.userId,
+    data.bookId,
+    data.authorId,
+  ]);
+  if (result.rows.length === 0) {
+    throw new DbError(404, 'Could not remove loan request');
+  }
+}
+
+async function removeLoan(
+  client: PoolClient | Pool,
+  data: { loanId: number; userId: number },
+) {
+  const deleteLoanQuery = `
+    DELETE FROM loan
+    WHERE loan_id = $1 AND user_id = $2
+      AND NOT EXISTS
+        (SELECT 1 FROM loan_book WHERE loan_id = $1 AND user_id = $2)
+      AND NOT EXISTS
+        (SELECT 1 FROM loan_request WHERE loan_id = $1 AND user_id = $2)
+    RETURNING 'deleted' AS status;
+    `;
+  const result = await client.query(deleteLoanQuery, [
+    data.loanId,
+    data.userId,
+  ]);
+  if (result.rows.length === 0) {
+    throw new DbError(500, 'Loan could not be removed');
+  }
+}
+
 const router = express.Router();
 
 router.get(
@@ -73,8 +122,7 @@ router.get(
     ]);
 
     if (result.rows.length === 0) {
-      res.sendStatus(404);
-      return;
+      throw new DbError(404, 'Could not identify book copy');
     }
 
     const rows = result.rows as Record<string, unknown>[];
@@ -142,8 +190,7 @@ router.get(
     ]);
 
     if (result.rows.length === 0) {
-      res.sendStatus(404);
-      return;
+      throw new DbError(404, 'Could not find loans');
     }
 
     const rows = result.rows as Record<string, unknown>[];
@@ -202,10 +249,9 @@ router.post(
       ]);
       const rows = result.rows as Record<string, unknown>[];
       if (rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(500);
-        return;
+        throw new DbError(500, 'Could not request loan');
       }
+
       const loan = mapLoanResult(rows[0]);
 
       const insertLoanReqQuery = `
@@ -224,7 +270,6 @@ router.post(
     } catch (e) {
       // TODO: Set proper code based on error
       await client.query('ROLLBACK');
-      res.sendStatus(500);
       throw e;
     } finally {
       client.release();
@@ -239,8 +284,8 @@ router.patch(
   librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
-    const userId = req.userId;
-    const libraryId = req.libraryId;
+    const userId = req.userId as number;
+    const libraryId = req.libraryId as number;
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
       return;
@@ -248,10 +293,8 @@ router.patch(
 
     const data = matchedData(req);
     const client = await db.getClient();
-    try {
-      const loanParams = [data.loanId, userId, data.bookId, data.authorId];
-      const copiesParams = [libraryId, data.bookId, data.authorId];
 
+    try {
       await client.query('BEGIN');
 
       const setLibrarianQuery = `
@@ -260,84 +303,101 @@ router.patch(
         WHERE loan_id = $1 AND user_id = $2
         RETURNING 'updated' AS status;
         `;
-      let result = await client.query(setLibrarianQuery, [
+      const result = await client.query(setLibrarianQuery, [
         data.loanId,
         userId,
         libraryId,
       ]);
       if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(404);
-        return;
+        throw new DbError(404, 'Could not find librarian user to approve loan');
       }
 
-      const removeLoanReqQuery = `
-        DELETE FROM loan_request
-        WHERE loan_id = $1 AND user_id = $2 AND book_id = $3 AND author_id = $4
-        RETURNING 'deleted' AS status;
-        `;
-      result = await client.query(removeLoanReqQuery, loanParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(404);
-        return;
-      }
+      const params = {
+        loanId: data.loanId as number,
+        bookId: data.bookId as number,
+        authorId: data.authorId as number,
+        userId: userId,
+        libraryId: libraryId,
+      };
+      await removeLoanReq(false, client, params);
+      await decrementBookCopies(client, params);
 
       const insertLoanAppQuery = `
         INSERT INTO loan_book (loan_id, user_id, book_id, author_id)
         VALUES ($1, $2, $3, $4);
         `;
-      await client.query(insertLoanAppQuery, loanParams);
-
-      const lockCopiesRowQuery = `
-        SELECT no_of_copies
-        FROM library_contains
-        WHERE library_id = $1 AND book_id = $2 AND author_id = $3
-          AND no_of_copies > 0
-        FOR UPDATE;
-        `;
-      result = await client.query(lockCopiesRowQuery, copiesParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.status(409).send('No copies for requested book available');
-        return;
-      }
-
-      const removeCopyQuery = `
-        UPDATE library_contains
-        SET no_of_copies = no_of_copies - 1
-        WHERE library_id = $1 AND book_id = $2 AND author_id = $3
-          AND no_of_copies > 0
-        RETURNING 'deleted' AS status;
-        `;
-      result = await client.query(removeCopyQuery, copiesParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(500);
-        return;
-      }
+      await client.query(insertLoanAppQuery, [
+        data.loanId,
+        userId,
+        data.bookId,
+        data.authorId,
+      ]);
 
       await client.query('COMMIT');
-      res.sendStatus(200);
     } catch (e) {
-      // TODO: Set proper code based on error
       await client.query('ROLLBACK');
-      res.sendStatus(500);
       throw e;
     } finally {
       client.release();
     }
+
+    res.sendStatus(200);
   },
 );
+
+async function deleteUnapprovedLoan(
+  client: PoolClient,
+  params: { loanId: number; bookId: number; authorId: number; userId: number },
+) {
+  await removeLoanReq(false, client, params);
+  await removeLoan(client, params);
+}
+
+async function deleteApprovedLoan(
+  client: PoolClient,
+  data: { loanId: number; bookId: number; authorId: number; userId: number },
+) {
+  const getLibraryIdQuery = `
+    SELECT library_id
+    FROM librarian
+    WHERE librarian_id = (
+      SELECT librarian_id
+      FROM loan
+      WHERE loan_id = $1 AND user_id = $2
+    );
+    `;
+  const result = await client.query(getLibraryIdQuery, [
+    data.loanId,
+    data.userId,
+  ]);
+  if (result.rows.length === 0) {
+    throw new DbError(404, 'Loan could not be associated to library');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  } else if (result.rows[0].library_id === null) {
+    throw new DbError(409, 'Loan could not be associated to library');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const libraryId = result.rows[0].library_id as number;
+
+  await removeLoanReq(true, client, data);
+  await incrementBookCopies(client, {
+    bookId: data.bookId,
+    authorId: data.authorId,
+    libraryId: libraryId,
+  });
+  await removeLoan(client, { loanId: data.loanId, userId: data.userId });
+}
 
 router.delete(
   '/:loanId',
   param('loanId').isInt({ min: 1 }),
   body(['bookId', 'authorId']).isInt({ min: 1 }),
+  body('approved').default(true).toBoolean(true),
   userConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
-    const userId = req.userId;
+    const userId = req.userId as number;
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
       return;
@@ -345,97 +405,31 @@ router.delete(
 
     const data = matchedData(req);
     const client = await db.getClient();
-    try {
-      const loanParams = [data.loanId, userId, data.bookId, data.authorId];
 
+    const params = {
+      loanId: data.loanId as number,
+      bookId: data.bookId as number,
+      authorId: data.authorId as number,
+      userId: userId,
+    };
+    try {
       await client.query('BEGIN');
 
-      const getLibraryIdQuery = `
-        SELECT library_id
-        FROM librarian
-        WHERE librarian_id = (
-          SELECT librarian_id
-          FROM loan
-          WHERE loan_id = $1 AND user_id = $2
-        );
-        `;
-      let result = await client.query(getLibraryIdQuery, [data.loanId, userId]);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(404);
-        return;
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      } else if (result.rows[0].library_id === null) {
-        await client.query('ROLLBACK');
-        res.sendStatus(409);
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const libraryId = result.rows[0].library_id as number;
-      const copiesParams = [libraryId, data.bookId, data.authorId];
-
-      const removeLoanReqQuery = `
-        DELETE FROM loan_book
-        WHERE loan_id = $1 AND user_id = $2 AND book_id = $3 AND author_id = $4
-        RETURNING 'deleted' AS status;
-        `;
-      result = await client.query(removeLoanReqQuery, loanParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(404);
-        return;
-      }
-
-      const lockCopiesRowQuery = `
-        SELECT no_of_copies
-        FROM library_contains
-        WHERE library_id = $1 AND book_id = $2 AND author_id = $3
-        FOR UPDATE;
-        `;
-      result = await client.query(lockCopiesRowQuery, copiesParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.status(409).send('No copies for requested book available');
-        return;
-      }
-
-      const addCopyQuery = `
-        UPDATE library_contains
-        SET no_of_copies = no_of_copies + 1
-        WHERE library_id = $1 AND book_id = $2 AND author_id = $3
-        RETURNING 'updated' AS status;
-        `;
-      result = await client.query(addCopyQuery, copiesParams);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(500);
-        return;
-      }
-
-      const deleteLoanQuery = `
-        DELETE FROM loan
-        WHERE loan_id = $1 AND user_id = $2
-          AND NOT EXISTS
-            (SELECT 1 FROM loan_book WHERE loan_id = $1 AND user_id = $2)
-        RETURNING 'deleted' AS status;
-        `;
-      result = await client.query(deleteLoanQuery, [data.loanId, userId]);
-      if (result.rows.length === 0) {
-        await client.query('ROLLBACK');
-        res.sendStatus(500);
-        return;
+      if (data.approved) {
+        await deleteApprovedLoan(client, params);
+      } else {
+        await deleteUnapprovedLoan(client, params);
       }
 
       await client.query('COMMIT');
-      res.sendStatus(200);
     } catch (e) {
-      // TODO: Set proper code based on error
       await client.query('ROLLBACK');
-      res.sendStatus(500);
       throw e;
     } finally {
       client.release();
     }
+
+    res.sendStatus(200);
   },
 );
 
