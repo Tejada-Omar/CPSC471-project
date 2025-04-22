@@ -107,6 +107,7 @@ export const userConfirmation = roleConfirmation([
   'user',
   'admin',
   'librarian',
+  'headLibrarian',
 ]);
 export const librarianConfirmation = roleConfirmation([
   'librarian',
