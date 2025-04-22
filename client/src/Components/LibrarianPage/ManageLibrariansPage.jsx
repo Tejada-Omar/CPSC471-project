@@ -68,11 +68,10 @@ const ManageLibrariansPage = () => {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify({selectedUserId}),
+          body: JSON.stringify({userId: selectedUserId}),
         }
       );
 
-      console.log(selectedUserId);
       const data = await response.json();
 
       if (!response.ok) {
@@ -80,11 +79,11 @@ const ManageLibrariansPage = () => {
         throw new Error(data.error || "An unexpected error occurred");
       }
 
-      setUserSuccess("User deleted successfully");
+      setUserSuccess("User added successfully");
       setUserError("");
     } catch (error) {
       setUserError(
-        "Could not delete user successfully. Check fields and try again. :" +
+        "Could not add user successfully. Check fields and try again. :" +
           error.message
       );
       setUserSuccess("");
@@ -115,10 +114,10 @@ const ManageLibrariansPage = () => {
           <Stack spacing={4}>
             {/*  Select User */}
             <FormControl size="small">
-              <InputLabel>User</InputLabel>
+              <InputLabel>Select User</InputLabel>
               <Select
                 label="User"
-                onChange={(event) => setSelectedUserId(event.target.value)}
+                onChange={(event) => setSelectedUserId(Number(event.target.value))}
               >
                 {users.map((user) => (
                   <MenuItem key={user.user_id} value={user.user_id}>
@@ -127,7 +126,7 @@ const ManageLibrariansPage = () => {
                 ))}
               </Select>
             </FormControl>
-            <Button sx={{ color: "red" }} onClick={handleAddLibrarian}>
+            <Button onClick={handleAddLibrarian}>
               Add Librarian
             </Button>
           </Stack>
