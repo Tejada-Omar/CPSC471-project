@@ -8,11 +8,9 @@ import {
   useMediaQuery,
   Stack,
   Divider,
-  Rating,
-  Button,
-  Avatar,
 } from "@mui/material";
 import { API_URL } from "../../utils/constants";
+import { Link } from "react-router-dom";
 
 const AuthorPage = () => {
   const { authorId } = useParams();
@@ -79,18 +77,6 @@ const AuthorPage = () => {
       >
         {/* Author Profile Section */}
         <Stack spacing={2} alignItems="center">
-          {/* Avatar or Profile Image */}
-          <Avatar
-            sx={{
-              width: 120,
-              height: 120,
-              marginBottom: 2,
-              border: "4px solid #ddd",
-            }}
-            src="/path-to-author-image.jpg" // Replace with actual image URL if available
-            alt={authorData.author.name}
-          />
-
           {/* Author Name */}
           <Typography variant="h4" gutterBottom>
             {authorData.author.name}
@@ -106,6 +92,52 @@ const AuthorPage = () => {
           </Typography>
 
           <Divider sx={{ width: "100%", marginY: 2 }} />
+        </Stack>
+
+        {/* New Section for Books and Number of Copies */}
+        <Stack spacing={2} alignItems="left" mt={4}>
+          <Typography variant="h6" gutterBottom>
+            Books Available:
+          </Typography>
+          {authorData.books && authorData.books.length > 0 ? (
+            authorData.books.map((book) => (
+              <Box
+                key={`${book.id}-${book.authorId}`}
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                p={2}
+                sx={{ border: "1px solid #eee", borderRadius: 2 }}
+              >
+                <Box>
+                  <Link
+                    to={`/book/${book.id}/${book.authorId}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Typography
+                      variant="subtitle1"
+                      color="text.primary"
+                      sx={{
+                        "&:hover": {
+                          color: "primary.main",
+                          cursor: "pointer",
+                        },
+                      }}
+                    >
+                      {book.title}
+                    </Typography>
+                  </Link>
+                  <Typography variant="body2" color="text.secondary">
+                    {book.synopsis
+                      ? book.synopsis.slice(0, 100) + "..."
+                      : "No synopsis available..."}
+                  </Typography>
+                </Box>
+              </Box>
+            ))
+          ) : (
+            <Typography>No books available.</Typography>
+          )}
         </Stack>
       </Paper>
     </Box>
