@@ -8,6 +8,14 @@ import {
   userConfirmation,
 } from '../utils/middleware.js';
 
+import {
+  body,
+  matchedData,
+  param,
+  query,
+  validationResult,
+} from 'express-validator';
+
 const userRouter = express.Router();
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
@@ -184,20 +192,83 @@ userRouter.get(
   },
 );
 
-// Add a librarian (in progress)
+// Add a librarian
 userRouter.post(
   '/librarian',
+  body(['userId']).isInt({ min: 1 }),
   headLibrarianConfirmation,
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-      const result = await db.query(
-        `SELECT *
-       FROM users`,
+      const vResult = validationResult(req);
+
+      if (!vResult.isEmpty()) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const headLibrarianId = req.userId;
+      const libraryId = req.libraryId;
+
+      const data = matchedData(req);
+
+      await db.query(
+        `INSERT INTO librarian (librarian_id, manager_id, library_id)
+        VALUES ($1, $2, $3)
+        RETURNING *`,
+        [data.userId, headLibrarianId, libraryId],
       );
 
-      return res.status(200).json(result.rows);
+      return res.status(201).json({ message: 'librarian created' });
     } catch (error: any) {
       next(error);
+    }
+  },
+);
+
+// Appoint a head librarian
+userRouter.post(
+  '/headLibrarian',
+  body(['userId', 'libraryId']).isInt({ min: 1 }),
+  adminConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const vResult = validationResult(req);
+
+    if (!vResult.isEmpty()) {
+      res.sendStatus(400);
+      return;
+    }
+
+    const adminId = req.userId;
+
+    const data = matchedData(req);
+    const client = await db.getClient();
+    try {
+      await client.query('BEGIN');
+
+      await db.query(
+        `INSERT INTO head_librarian (super_id, appointer)
+        VALUES ($1, $2)
+        RETURNING *`,
+        [data.userId, adminId],
+      );
+
+      await db.query(
+        `INSERT INTO librarian (librarian_id, manager_id, library_id)
+        SELECT $1, $1, $2
+        WHERE NOT EXISTS (
+          SELECT 1 FROM librarian WHERE librarian_id = $1
+        )
+        RETURNING *`,
+        [data.userId, data.libraryId],
+      );
+
+      await client.query('COMMIT');
+      return res.status(201).json({ message: 'head librarian created' });
+    } catch (error: any) {
+      await client.query('ROLLBACK');
+      next(error);
+    } finally {
+      client.release();
     }
   },
 );
