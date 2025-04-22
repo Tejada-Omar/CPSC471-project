@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { DbError } from './errors.js';
 
 // Ensure SECRET is a non-undefined string, or throw an error if it's missing
 const SECRET = process.env.SECRET;
@@ -110,15 +111,18 @@ export const adminConfirmation = roleConfirmation(['admin']);
 // General error handler
 export const errorHandler: ErrorRequestHandler = (
   error: Error,
-  _request,
-  response,
+  _req,
+  res,
   next,
 ) => {
-  if (error.name === 'JsonWebTokenError') {
-    response.status(401).json({ error: 'token invalid' });
+  if (error instanceof jwt.JsonWebTokenError) {
+    res.status(401).json({ error: 'token invalid' });
     return;
-  } else if (error.name === 'TokenExpiredError') {
-    response.status(401).json({ error: 'token expired' });
+  } else if (error instanceof jwt.TokenExpiredError) {
+    res.status(401).json({ error: 'token expired' });
+    return;
+  } else if (error instanceof DbError) {
+    res.status(error.status).json({ error: error.message });
     return;
   }
 
