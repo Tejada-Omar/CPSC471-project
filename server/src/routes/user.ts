@@ -153,4 +153,23 @@ userRouter.get(
   },
 );
 
+// Get all users
+userRouter.get(
+  '/allUsers',
+  adminConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+
+      const result = await db.query(
+        `SELECT *
+       FROM users`
+      );
+
+      return res.status(200).json(result.rows);
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
 export default userRouter;

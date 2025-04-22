@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, TextField, Button, Stack, Typography } from "@mui/material";
+import { Box, TextField, Button, Stack, Typography, Paper } from "@mui/material";
 
 import "./AdminStyles.css";
+import UsersList from "./Components/UsersList";
+import ReviewsList from "./Components/ReviewsList";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -19,27 +21,25 @@ const AdminPage = () => {
       </Box>
 
       <Box id="librarianButtons">
-        <Button onClick={() => handleClick("/addLibrary")}> Add Library </Button>
-        <Button onClick={() => handleClick("/appointLibrarian")}> Appoint Librarian </Button>
+        <Button onClick={() => handleClick("/addLibrary")}>
+          {" "}
+          Add Library{" "}
+        </Button>
+        <Button onClick={() => handleClick("/appointLibrarian")}>
+          {" "}
+          Appoint Librarian{" "}
+        </Button>
       </Box>
 
-      <Box class="adminSection">
-        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-          Users
-        </Typography>
-      </Box>
+      <Paper
+        elevation={3}
+        sx={{ padding: 5, borderRadius: 2, boxShadow: 3, mt: 3, paddingTop: 1 }}
+      >
+        <UsersList title={"Users"}></UsersList>
 
-      <Box class="adminSection">
-        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-          Reviews
-        </Typography>
-      </Box>
+        <ReviewsList title="Reviews"></ReviewsList>
 
-      <Box class="adminSection">
-        <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-          Librarians
-        </Typography>
-      </Box>
+      </Paper>
     </Box>
   );
 };
