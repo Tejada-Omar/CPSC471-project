@@ -8,6 +8,14 @@ import {
   userConfirmation,
 } from '../utils/middleware.js';
 
+import {
+  body,
+  matchedData,
+  param,
+  query,
+  validationResult,
+} from 'express-validator';
+
 const userRouter = express.Router();
 
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/;
@@ -184,18 +192,38 @@ userRouter.get(
   },
 );
 
-// Add a librarian (in progress)
+// Add a librarian
 userRouter.post(
   '/librarian',
+  body(['userId']).isInt({ min: 1 }),
   headLibrarianConfirmation,
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
+      const vResult = validationResult(req);
+
+      if (!vResult.isEmpty()) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const headLibrarianId = req.userId;
+      const libraryId = req.libraryId;
+
+      const data = matchedData(req);
+
       const result = await db.query(
-        `SELECT *
-       FROM users`,
+        `INSERT INTO librarian (librarian_id, manager_id, library_id)
+        VALUES ($1, $2, $3)
+        RETURNING *`,
+        [data.userId, headLibrarianId, libraryId],
       );
 
-      return res.status(200).json(result.rows);
+      if (result.rows.length === 0) {
+        res.sendStatus(500);
+        return;
+      }
+
+      return res.status(201).json({ message: 'librarian created' });
     } catch (error: any) {
       next(error);
     }
