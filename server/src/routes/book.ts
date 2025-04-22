@@ -64,6 +64,35 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   }
 });
 
+// Search for all books in librarian
+router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
+  const libraryId = req.libraryId as number;
+
+  const searchByTitleQuery = `
+    SELECT
+      b.book_id,
+      b.title,
+      TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
+      b.synopsis,
+      a.aname AS author,
+      ARRAY_AGG(g.label) AS genres
+    FROM book b
+    JOIN author a ON b.author_id = a.author_id
+    LEFT JOIN genre g ON b.book_id = g.book_id
+    JOIN library_contains lc ON lc.book_id = b.book_id AND lc.author_id = b.author_id
+    WHERE lc.library_id = $1
+    GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname;
+    `;
+
+  const result = await db.query(searchByTitleQuery, [libraryId.toString()]);
+  if (result.rows.length === 0) {
+    res.sendStatus(404);
+  } else {
+    const rows = result.rows as Record<string, unknown>[];
+    res.json(rows);
+  }
+});
+
 // Search for a book by book and author id
 router.get(
   '/:bookId',
