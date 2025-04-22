@@ -67,6 +67,7 @@ const ManageLibrariansPage = () => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({userId: selectedUserId}),
         }
