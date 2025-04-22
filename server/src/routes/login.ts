@@ -12,7 +12,7 @@ interface UserRow {
   pass: string;
 }
 
-type role = 'admin' | 'librarian' | 'user';
+type role = 'admin' | 'librarian' | 'user' | 'headLibrarian';
 
 // JWT payload structure
 interface JwtPayload {
@@ -71,6 +71,16 @@ loginRouter.post(
       if (libraryResult.rows.length > 0) {
         role = 'librarian';
         libraryId = libraryResult.rows[0].library_id;
+      }
+
+      const headLibraryResult = await client.query(
+        `SELECT l.library_id FROM librarian l JOIN head_librarian hl ON hl.super_id = l.librarian_id WHERE librarian_id = $1`,
+        [user.user_id.toString()],
+      );
+
+      if (headLibraryResult.rows.length > 0) {
+        role = 'headLibrarian';
+        libraryId = headLibraryResult.rows[0].library_id;
       }
 
       const adminResult = await client.query(

@@ -23,7 +23,7 @@ declare global {
 interface JwtPayload {
   username: string;
   id: number;
-  role: 'admin' | 'user' | 'librarian';
+  role: 'admin' | 'user' | 'librarian' | 'headLibrarian';
   libraryId: number | null;
 }
 
@@ -50,7 +50,10 @@ const verifyTokenAndSetUserId = (
     }
 
     // Make sure librarian has library id
-    if (decodedToken.role === 'librarian') {
+    if (
+      decodedToken.role === 'librarian' ||
+      decodedToken.role === 'headLibrarian'
+    ) {
       if (!decodedToken.libraryId) {
         return null;
       }
@@ -105,7 +108,11 @@ export const userConfirmation = roleConfirmation([
   'admin',
   'librarian',
 ]);
-export const librarianConfirmation = roleConfirmation(['librarian']);
+export const librarianConfirmation = roleConfirmation([
+  'librarian',
+  'headLibrarian',
+]);
+export const headLibrarianConfirmation = roleConfirmation(['headLibrarian']);
 export const adminConfirmation = roleConfirmation(['admin']);
 
 // General error handler

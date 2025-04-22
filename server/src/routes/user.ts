@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import * as db from '../db/index.js';
 import {
   adminConfirmation,
+  headLibrarianConfirmation,
   librarianConfirmation,
   userConfirmation,
 } from '../utils/middleware.js';
@@ -125,6 +126,15 @@ userRouter.get(
   },
 );
 
+// Check if user is head librarian
+userRouter.get(
+  '/checkHeadLibrarian',
+  headLibrarianConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    return res.status(200).json({ message: 'successfully validated' });
+  },
+);
+
 // Check if user is admin
 userRouter.get(
   '/checkAdmin',
@@ -162,10 +172,9 @@ userRouter.get(
   adminConfirmation,
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
-
       const result = await db.query(
         `SELECT *
-       FROM users`
+       FROM users`,
       );
 
       return res.status(200).json(result.rows);
