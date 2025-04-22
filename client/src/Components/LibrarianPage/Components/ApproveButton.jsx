@@ -35,7 +35,7 @@ const ApproveButton = ({ loan, authToken, fetchData }) => {
 
       fetchData();
 
-      // Successfully returned book, update UI or show success
+      // Successfully approve loan, update UI or show success
       alert(`Loan for ${loan.title} has been approved successfully!`);
     } catch (error) {
       alert("Failed to approve the loan request: " + error.message);
