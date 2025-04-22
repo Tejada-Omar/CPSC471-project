@@ -1,15 +1,16 @@
 #userBox {
-    margin: 0 10% 0 10%;
+  padding: 2% 10% 5% 10%;
+  background-color: #f9f9f9;
 }
 
-#userHeader{
-    display: flex;
-    justify-content: space-between;
+#userHeader {
+  display: flex;
+  justify-content: space-between;
 }
 
 #userLoans {
-    margin-top: 5%;
-    padding: 2%;
-    border: 2px solid;
-    border-color: black;
+  margin-top: 5%;
+  padding: 2%;
+  border: 2px solid;
+  border-color: black;
 }
