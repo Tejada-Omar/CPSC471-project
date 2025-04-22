@@ -35,10 +35,11 @@ loginRouter.post(
     response: Response,
     next: NextFunction,
   ): Promise<any> => {
-    try {
-      const { username, password } = request.body;
+    const { username, password } = request.body;
+    const client = await db.getClient();
 
-      const result = await db.query(
+    try {
+      const result = await client.query(
         `SELECT * FROM authentication WHERE username = $1`,
         [username],
       );
@@ -62,7 +63,7 @@ loginRouter.post(
       let role: role = 'user';
       let libraryId = null;
 
-      const libraryResult = await db.query(
+      const libraryResult = await client.query(
         `SELECT library_id FROM librarian WHERE librarian_id = $1`,
         [user.user_id.toString()],
       );
@@ -72,7 +73,7 @@ loginRouter.post(
         libraryId = libraryResult.rows[0].library_id;
       }
 
-      const adminResult = await db.query(
+      const adminResult = await client.query(
         `SELECT 1 FROM admin WHERE super_id = $1`,
         [user.user_id.toString()],
       );
@@ -106,8 +107,10 @@ loginRouter.post(
         id: user.user_id,
       });
     } catch (error) {
-      await db.query('ROLLBACK');
+      await client.query('ROLLBACK');
       next(error);
+    } finally {
+      client.release();
     }
   },
 );

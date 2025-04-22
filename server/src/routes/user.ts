@@ -76,16 +76,17 @@ userRouter.post(
         .replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
     }
 
+    const client = await db.getClient();
     try {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      await db.query('BEGIN');
+      await client.query('BEGIN');
 
       // Insert user
-      const userInsertResult = await db.query(
-        `INSERT INTO users (uname, address, phone_no) 
-         VALUES ($1, $2, $3) 
+      const userInsertResult = await client.query(
+        `INSERT INTO users (uname, address, phone_no)
+         VALUES ($1, $2, $3)
          RETURNING user_id, uname, address, phone_no`,
         [username, address, phonenum],
       );
@@ -93,22 +94,24 @@ userRouter.post(
       const newUser: UserInsertRow = userInsertResult.rows[0];
 
       // Insert into authentication table
-      await db.query(
+      await client.query(
         `INSERT INTO authentication (user_id, username, pass) VALUES ($1, $2, $3)`,
         [newUser.user_id.toString(), username, hashedPassword],
       );
 
-      await db.query('COMMIT');
+      await client.query('COMMIT');
 
       return response.status(201).json({ user: newUser });
     } catch (error: any) {
-      await db.query('ROLLBACK');
+      await client.query('ROLLBACK');
 
       if (error.code === '23505') {
         return response.status(409).json({ error: 'Username already exists' });
       }
 
       next(error);
+    } finally {
+      client.release();
     }
   },
 );
