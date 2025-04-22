@@ -213,7 +213,7 @@ router.get('/availBooks', librarianConfirmation, async (req, res) => {
   const result = await db.query(getLoansForUserQuery, [libraryId.toString()]);
 
   if (result.rows.length === 0) {
-    res.sendStatus(404);
+    res.json([]);
     return;
   }
 
@@ -236,7 +236,7 @@ router.get('/activeLoans', librarianConfirmation, async (req, res) => {
   const result = await db.query(getLoansForUserQuery, [libraryId.toString()]);
 
   if (result.rows.length === 0) {
-    res.sendStatus(404);
+    res.json([]);
     return;
   }
 

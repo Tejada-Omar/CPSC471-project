@@ -48,7 +48,6 @@ const PendingLoansList = ({ title }) => {
           {title}
         </Typography>
 
-        {console.log(loanData)}
         {/* Generate a card for each loan */}
         {loanData.map((loan, index) => {
           const overdue = isOverdue(loan.ret_date); // Check if the loan is overdue
@@ -93,7 +92,7 @@ const PendingLoansList = ({ title }) => {
                     </Typography>
                   )}
 
-                  {/* "Return Book" Button */}
+                  {/* "Approve Loan" Button */}
 
                   <ApproveButton
                     loan={loan}

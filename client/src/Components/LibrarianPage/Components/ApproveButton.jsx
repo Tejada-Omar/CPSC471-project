@@ -2,43 +2,43 @@ import { Button } from "@mui/material";
 
 import { API_URL } from "../../../utils/constants";
 
-const ReturnButton = ({ loan, authToken, fetchData }) => {
-  const handleReturnBook = async (authToken) => {
+const ApproveButton = ({ loan, authToken, fetchData }) => {
+  const handleApproveLoan = async (authToken) => {
     try {
       const userResponse = confirm(
-        `Do you want to return book ${loan.book.title}?`,
+        `Approve this loan for ${loan.title}?`,
       );
       console.log(loan);
       if (!userResponse) {
         return;
       }
 
-      console.log("Returning book with Loan ID:", loan.loan.id);
+      console.log("Approving loan with Loan ID:", loan.loan_id);
 
       // API call
-      const response = await fetch(`${API_URL}/loan/${loan.loan.id}`, {
-        method: "DELETE",
+      const response = await fetch(`${API_URL}/loan/${loan.loan_id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          bookId: loan.book.id,
-          authorId: loan.book.authorId,
-          approved: true,
+          bookId: loan.book_id,
+          authorId: loan.author_id,
+          userId: loan.user_id
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to return the book");
+        throw new Error("Failed to approve the loan request");
       }
 
       fetchData();
 
       // Successfully returned book, update UI or show success
-      alert(`Book ${loan.book.title} has been returned successfully!`);
+      alert(`Loan for ${loan.title} has been approved successfully!`);
     } catch (error) {
-      alert("Error returning the book: " + error.message);
+      alert("Failed to approve the loan request: " + error.message);
     }
   };
 
@@ -46,11 +46,11 @@ const ReturnButton = ({ loan, authToken, fetchData }) => {
     <Button
       variant="contained"
       color="primary"
-      onClick={() => handleReturnBook(authToken)}
+      onClick={() => handleApproveLoan(authToken)}
     >
       Approve Loan
     </Button>
   );
 };
 
-export default ReturnButton;
+export default ApproveButton;
