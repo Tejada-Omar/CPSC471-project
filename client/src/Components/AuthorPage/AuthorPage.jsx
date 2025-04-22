@@ -22,8 +22,9 @@ const AuthorPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${API_URL}/author/${authorId}`);
+      const response = await fetch(`${API_URL}/author/${authorId}/book`);
       const data = await response.json();
+      console.log(data);
       setAuthorData(data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
@@ -87,12 +88,12 @@ const AuthorPage = () => {
               border: "4px solid #ddd",
             }}
             src="/path-to-author-image.jpg" // Replace with actual image URL if available
-            alt={authorData.name}
+            alt={authorData.author.name}
           />
 
           {/* Author Name */}
           <Typography variant="h4" gutterBottom>
-            {authorData.name}
+            {authorData.author.name}
           </Typography>
 
           {/* Biography */}
@@ -101,7 +102,7 @@ const AuthorPage = () => {
             paragraph
             sx={{ color: "text.secondary" }}
           >
-            {authorData.biography}
+            {authorData.author.biography}
           </Typography>
 
           <Divider sx={{ width: "100%", marginY: 2 }} />
