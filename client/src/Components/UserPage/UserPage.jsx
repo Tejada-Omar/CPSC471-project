@@ -19,6 +19,7 @@ const UserPage = () => {
 
   const [loanData, setLoanData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState({});
 
   const fetchData = async () => {
     try {
@@ -28,9 +29,18 @@ const UserPage = () => {
         },
       });
       const data = await response.json();
-      console.log(data);
 
       setLoanData(data);
+
+      const userResponse = await fetch(`${API_URL}/user/ownUser`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      const userDataTemp = await userResponse.json();
+
+      setUserData(userDataTemp);
     } catch (err) {
       console.error("Failed to fetch data:", err);
     } finally {
@@ -91,6 +101,44 @@ const UserPage = () => {
     return new Date(retDate) < today;
   };
 
+  // Function to handle the return book API call
+  const returnBook = async (loan) => {
+    try {
+      const userResponse = confirm(
+        `Do you want to return book ${loan.book.title}?`
+      );
+      console.log(loan);
+
+      if (userResponse) {
+        console.log("Returning book with Loan ID:", loan.loan.id);
+
+        // API call
+        const response = await fetch(`${API_URL}/loan/${loan.loan.id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            bookId: loan.book.id,
+            authorId: loan.book.authorId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to return the book");
+        }
+
+        fetchData();
+
+        // Successfully returned book, update UI or show success
+        alert(`Book ${loan.book.title} has been returned successfully!`);
+      }
+    } catch (error) {
+      alert("Error returning the book: " + error.message);
+    }
+  };
+
   if (isLoading) {
     return <>Loading...</>;
   }
@@ -98,7 +146,7 @@ const UserPage = () => {
   return (
     <Box id="userBox">
       <Box id="userHeader">
-        <Typography variant="h3">Hello user!</Typography>
+        <Typography variant="h3">Hello {userData.uname}!</Typography>
         <Button onClick={() => handleClick("/")}>Return home</Button>
       </Box>
 
@@ -152,6 +200,15 @@ const UserPage = () => {
                       This loan is overdue!
                     </Typography>
                   )}
+
+                  {/* "Return Book" Button */}
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => returnBook(loan)}
+                  >
+                    Return Book
+                  </Button>
                 </Stack>
               </CardContent>
             </Card>

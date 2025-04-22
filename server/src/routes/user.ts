@@ -4,6 +4,7 @@ import * as db from '../db/index.js';
 import {
   adminConfirmation,
   librarianConfirmation,
+  userConfirmation,
 } from '../utils/middleware.js';
 
 const userRouter = express.Router();
@@ -127,6 +128,28 @@ userRouter.get(
   adminConfirmation,
   async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
     return res.status(200).json({ message: 'successfully validated' });
+  },
+);
+
+// Get user's own data
+userRouter.get(
+  '/ownUser',
+  userConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const userId = req.userId as number;
+
+      const result = await db.query(
+        `SELECT *
+       FROM users
+       WHERE user_id = $1`,
+        [userId.toString()],
+      );
+
+      return res.status(200).json(result.rows[0]);
+    } catch (error: any) {
+      next(error);
+    }
   },
 );
 
