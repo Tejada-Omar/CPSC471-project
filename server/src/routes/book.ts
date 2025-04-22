@@ -101,7 +101,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
 router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
   const libraryId = req.libraryId as number;
 
-  const searchByTitleQuery = `
+  const getAllLibraryBooks = `
     SELECT
       b.book_id,
       b.author_id,
@@ -118,7 +118,7 @@ router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
     GROUP BY b.book_id, b.author_id, b.title, b.pdate, b.synopsis, a.aname;
     `;
 
-  const result = await db.query(searchByTitleQuery, [libraryId.toString()]);
+  const result = await db.query(getAllLibraryBooks, [libraryId.toString()]);
   if (result.rows.length === 0) {
     res.sendStatus(404);
   } else {
