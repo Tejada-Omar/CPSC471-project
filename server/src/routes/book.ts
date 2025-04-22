@@ -242,10 +242,10 @@ router.put(
         AND author_id = $2
         AND EXISTS (
           SELECT 1
-          FROM library_contains
-          WHERE book_id = $1
-            AND author_id = $2
-            AND library_id = $3
+          FROM library_contains lc
+          WHERE lc.book_id = $1
+            AND lc.author_id = $2
+            AND lc.library_id = $3
         )
       RETURNING 'updated' AS status;
       `;
