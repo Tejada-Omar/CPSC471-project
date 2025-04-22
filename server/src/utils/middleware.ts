@@ -115,6 +115,10 @@ export const librarianConfirmation = roleConfirmation([
 ]);
 export const headLibrarianConfirmation = roleConfirmation(['headLibrarian']);
 export const adminConfirmation = roleConfirmation(['admin']);
+export const headLibrarianConfirmationPlus = roleConfirmation([
+  'headLibrarian',
+  'admin',
+]);
 
 // General error handler
 export const errorHandler: ErrorRequestHandler = (

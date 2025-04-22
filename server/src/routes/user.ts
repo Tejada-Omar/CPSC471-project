@@ -4,6 +4,7 @@ import * as db from '../db/index.js';
 import {
   adminConfirmation,
   headLibrarianConfirmation,
+  headLibrarianConfirmationPlus,
   librarianConfirmation,
   userConfirmation,
 } from '../utils/middleware.js';
@@ -177,7 +178,7 @@ userRouter.get(
 // Get all users
 userRouter.get(
   '/allUsers',
-  adminConfirmation,
+  headLibrarianConfirmationPlus,
   async (req: Request, res: Response, next: NextFunction): Promise<any> => {
     try {
       const result = await db.query(
@@ -269,6 +270,33 @@ userRouter.post(
       next(error);
     } finally {
       client.release();
+    }
+  },
+);
+
+// Get all librarians (for head librarian)
+userRouter.get(
+  '/allLibrarians',
+  headLibrarianConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    const libraryId = req.libraryId as number;
+
+    try {
+      const result = await db.query(
+        `SELECT *
+       FROM librarian l
+       JOIN users u ON l.librarian_id = u.user_id
+       WHERE library_id = $1`,
+        [libraryId.toString()],
+      );
+
+      if (result.rows.length === 0) {
+        res.sendStatus(404).json({ message: 'No librarians found' });
+      }
+
+      return res.status(200).json(result.rows);
+    } catch (error: any) {
+      next(error);
     }
   },
 );
