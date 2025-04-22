@@ -35,14 +35,20 @@ const BookPage = () => {
       const reviewResponse = await fetch(
         `${API_URL}/review?bookId=${bookId}&authorId=${authorId}`
       );
-      const reviewDataTemp = await reviewResponse.json();
-      setReviewData(reviewDataTemp);
+
+      if (reviewResponse.status === 200) {
+        const reviewDataTemp = await reviewResponse.json();
+        setReviewData(reviewDataTemp);
+      }
 
       const libraryResponse = await fetch(
         `${API_URL}/library/booklibs?bookId=${bookId}&authorId=${authorId}`
       );
-      const libraryDataTemp = await libraryResponse.json();
-      setLibraryData(libraryDataTemp);
+
+      if (libraryResponse.status === 200) {
+        const libraryDataTemp = await libraryResponse.json();
+        setLibraryData(libraryDataTemp);
+      }
     } catch (err) {
       console.error("Failed to fetch data:", err);
     } finally {
@@ -85,7 +91,6 @@ const BookPage = () => {
           },
         });
         const data = await response.json();
-        console.log(data);
 
         if (response.status === 201) {
           alert(`Created loan request for ${book.title}`);
@@ -257,7 +262,7 @@ const BookPage = () => {
                 </Box>
               ))}
             </Stack>
-            {authToken && (
+            {authToken && libraryData.length > 0 && (
               <Button
                 fullWidth
                 variant="contained"
