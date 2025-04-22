@@ -2,24 +2,25 @@ import { useEffect, useState } from "react";
 import { Stack, Typography, Card, CardContent, Box } from "@mui/material";
 import { API_URL } from "../../../utils/constants";
 
-import RemoveUserButton from "./removeUserButton"
+import RemoveReviewButton from "./RemoveReviewButton"
 
-const UsersList = ({ title }) => {
+const ReviewsList = ({ title }) => {
   const authToken = localStorage.getItem("authToken");
 
-  const [userData, setUserData] = useState([]);
+  const [reviewData, setReviewData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
     try {
-      const loanResponse = await fetch(`${API_URL}/user/allUsers`, {
+      const loanResponse = await fetch(`${API_URL}/review/`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
 
-      const userData = await loanResponse.json();
-      setUserData(userData);
+      const reviewData = await loanResponse.json();
+      console.log(reviewData)
+      setReviewData(reviewData);
     } catch (err) {
       console.error("Failed to fetch data:", err);
     } finally {
@@ -43,24 +44,29 @@ const UsersList = ({ title }) => {
         </Typography>
 
         {/* Generate a card for each loan */}
-        {userData.map((user, index) => {
+        {reviewData.map((review, index) => {
 
           return (
             <Card
-              key={user.user_id}
+              key={review.review_id}
               sx={{
                 mt: 2,
+                p: 1,
                 boxShadow: 2,
                 borderRadius: 2,
               }}
             >
               <CardContent>
-                <Stack direction={"row"} spacing={4} flexWrap="wrap" justifyContent={"space-between"} alignItems={"center"}>
-                <Typography variant="h6">User ID: {user.user_id}</Typography>
-                  <Typography variant="h6">Name: {user.uname}</Typography>
-                  <Typography variant="h6">Address: {user.address}</Typography>
-                  <Typography variant="h6">Phone Number: {user.phone_no}</Typography>
+                <Box>
+                <Stack spacing={2} direction={"row"} justifyContent={"space-between"} marginBottom={1}>
+                <Typography variant="h6">Review ID: {review.review_id}</Typography>
+                  <Typography variant="h6">User ID: {review.user_id}</Typography>
+                  <Typography variant="h6">Book ID: {review.book_id}</Typography>
+                  <Typography variant="h6">Rating: {review.rating}</Typography>
                 </Stack>
+                <Typography variant="h6">Body: {review.body}</Typography>
+                </Box>
+                
               </CardContent>
             </Card>
           );
@@ -70,4 +76,4 @@ const UsersList = ({ title }) => {
   );
 };
 
-export default UsersList;
+export default ReviewsList;

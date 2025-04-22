@@ -81,7 +81,7 @@ router.get(
     } else {
       // Case 3: Returning all reviews if no filter parameters are provided
       const searchQuery = `
-        SELECT r.review_id, u.uname AS reviewer, r.rating, r.body
+        SELECT r.review_id, r.user_id, r.book_id, u.uname AS reviewer, r.rating, r.body
         FROM review r
         JOIN users u ON r.user_id = u.user_id;
       `;

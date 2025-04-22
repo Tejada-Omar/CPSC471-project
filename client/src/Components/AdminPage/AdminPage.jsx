@@ -4,6 +4,7 @@ import { Box, TextField, Button, Stack, Typography, Paper } from "@mui/material"
 
 import "./AdminStyles.css";
 import UsersList from "./Components/UsersList";
+import ReviewsList from "./Components/ReviewsList";
 
 const AdminPage = () => {
   const navigate = useNavigate();
@@ -36,11 +37,7 @@ const AdminPage = () => {
       >
         <UsersList title={"Users"}></UsersList>
 
-        <Box class="adminSection">
-          <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-            Reviews
-          </Typography>
-        </Box>
+        <ReviewsList title="Reviews"></ReviewsList>
 
       </Paper>
     </Box>
