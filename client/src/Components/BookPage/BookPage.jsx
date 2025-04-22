@@ -9,6 +9,7 @@ import {
   Stack,
   Divider,
   Rating,
+  Button,
 } from "@mui/material";
 import { API_URL } from "../../utils/constants";
 import ReviewDialog from "./Components/ReviewDialog";
@@ -56,12 +57,45 @@ const BookPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleLoanRequest = (library) => {
+  const handleLoanRequest = async () => {
     const userResponse = confirm(
-      `Do you want to request a loan for ${book.title} by ${book.author} from ${library.library_name}?`
+      `Do you want to request a loan for ${book.title} by ${book.author}?`
     );
     if (userResponse) {
-      alert("create loan request");
+      try {
+        const currentDate = new Date(); // Current date (startDate)
+        const returnDate = new Date(currentDate);
+        returnDate.setDate(currentDate.getDate() + 21); // Add 3 weeks for retDate
+
+        // Format the dates as ISO8601 strings
+        const formattedStartDate = currentDate.toISOString();
+        const formattedReturnDate = returnDate.toISOString();
+
+        const response = await fetch(`${API_URL}/loan`, {
+          method: "POST",
+          body: JSON.stringify({
+            bookId,
+            authorId,
+            startDate: formattedStartDate,
+            retDate: formattedReturnDate,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        const data = await response.json();
+        console.log(data);
+
+        if (response.status === 201) {
+          alert(`Created loan request for ${book.title}`);
+        } else {
+          alert("Failed to create loan request");
+        }
+      } catch (err) {
+        alert("Failed to create loan request");
+        console.error(err);
+      }
     }
   };
 
@@ -220,24 +254,19 @@ const BookPage = () => {
                       Copies available: {library.no_of_copies}
                     </Typography>
                   </Box>
-                  {library.no_of_copies > 0 && authToken && (
-                    <button
-                      onClick={() => handleLoanRequest(library)}
-                      style={{
-                        backgroundColor: "#1976d2",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Request Loan
-                    </button>
-                  )}
                 </Box>
               ))}
             </Stack>
+            {authToken && (
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{ marginTop: "2em" }}
+                onClick={() => handleLoanRequest()}
+              >
+                Request Loan
+              </Button>
+            )}
           </Box>
 
           <Divider />

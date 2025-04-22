@@ -18,12 +18,13 @@ const UserPage = () => {
   const navigate = useNavigate();
 
   const [loanData, setLoanData] = useState([]);
+  const [requestedLoanData, setRequestedLoanData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userData, setUserData] = useState({});
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${API_URL}/loan/user?required={true}`, {
+      const response = await fetch(`${API_URL}/loan/user`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
@@ -41,6 +42,18 @@ const UserPage = () => {
       const userDataTemp = await userResponse.json();
 
       setUserData(userDataTemp);
+
+      const requestedLoanResponse = await fetch(
+        `${API_URL}/loan/user?approved={false}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      const requestLoanData = await requestedLoanResponse.json();
+
+      setRequestedLoanData(requestLoanData);
     } catch (err) {
       console.error("Failed to fetch data:", err);
     } finally {
@@ -155,7 +168,7 @@ const UserPage = () => {
         sx={{ padding: 5, borderRadius: 2, boxShadow: 3, mt: 3 }}
       >
         <Typography variant="h5" sx={{ textDecoration: "underline" }}>
-          My Loans
+          My Current Loans
         </Typography>
 
         {/* Generate a card for each loan */}
@@ -209,6 +222,57 @@ const UserPage = () => {
                   >
                     Return Book
                   </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          );
+        })}
+        <Typography variant="h5" mt={6} sx={{ textDecoration: "underline" }}>
+          My Requested Loans
+        </Typography>
+
+        {/* Generate a card for each loan */}
+        {requestedLoanData.map((loan, index) => {
+          const overdue = isOverdue(loan.loan.retDate); // Check if the loan is overdue
+
+          return (
+            <Card
+              key={loan.loan.id}
+              sx={{
+                mt: 2,
+                p: 2,
+                backgroundColor: overdue ? "#ffe6e6" : "white", // Slightly red tint for overdue loans
+                border: overdue ? "1px solid red" : "1px solid grey",
+                boxShadow: 2,
+                borderRadius: 2,
+              }}
+            >
+              <CardContent>
+                <Stack spacing={2}>
+                  <Typography variant="h6">Loan ID: {loan.loan.id}</Typography>
+                  <Typography variant="h6">
+                    Book Title: {loan.book.title}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Synopsis:</strong> {loan.book.synopsis}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Loan Start Date:</strong>{" "}
+                    {new Date(loan.loan.startDate).toLocaleDateString()}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>Return Date:</strong>{" "}
+                    {new Date(loan.loan.retDate).toLocaleDateString()}
+                  </Typography>
+                  {overdue && (
+                    <Typography
+                      variant="body2"
+                      color="red"
+                      sx={{ fontStyle: "italic" }}
+                    >
+                      This loan is overdue!
+                    </Typography>
+                  )}
                 </Stack>
               </CardContent>
             </Card>
