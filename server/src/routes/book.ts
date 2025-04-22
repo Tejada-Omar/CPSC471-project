@@ -60,7 +60,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
     res.sendStatus(404);
   } else {
     const rows = result.rows as Record<string, unknown>[];
-    res.json(rows.map((r) => mapBookResult(r)));
+    res.json(rows.map((r) => ({ ...mapBookResult(r), author: r.author })));
   }
 });
 

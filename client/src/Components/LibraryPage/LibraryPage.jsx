@@ -12,18 +12,18 @@ import {
 import { API_URL } from "../../utils/constants";
 import { Link } from "react-router-dom";
 
-const AuthorPage = () => {
-  const { authorId } = useParams();
+const LibraryPage = () => {
+  const { libraryId } = useParams();
 
-  const [authorData, setAuthorData] = useState([]);
+  const [libraryData, setLibraryData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${API_URL}/author/${authorId}/book`);
+      const response = await fetch(`${API_URL}/library/${libraryId}/book`);
       const data = await response.json();
       console.log(data);
-      setAuthorData(data);
+      setLibraryData(data);
     } catch (err) {
       console.error("Failed to fetch data:", err);
     } finally {
@@ -75,20 +75,17 @@ const AuthorPage = () => {
           maxWidth: "800px",
         }}
       >
-        {/* Author Profile Section */}
         <Stack spacing={2} alignItems="center">
-          {/* Author Name */}
           <Typography variant="h4" gutterBottom>
-            {authorData.author.name}
+            {libraryData.library.name}
           </Typography>
 
-          {/* Biography */}
           <Typography
             variant="body1"
             paragraph
             sx={{ color: "text.secondary" }}
           >
-            {authorData.author.biography}
+            {libraryData.library.loc}
           </Typography>
 
           <Divider sx={{ width: "100%", marginY: 2 }} />
@@ -99,8 +96,8 @@ const AuthorPage = () => {
           <Typography variant="h6" gutterBottom>
             Books Available:
           </Typography>
-          {authorData.books && authorData.books.length > 0 ? (
-            authorData.books.map((book) => (
+          {libraryData.books && libraryData.books.length > 0 ? (
+            libraryData.books.map((book) => (
               <Box
                 key={`${book.id}-${book.authorId}`}
                 display="flex"
@@ -128,9 +125,7 @@ const AuthorPage = () => {
                     </Typography>
                   </Link>
                   <Typography variant="body2" color="text.secondary">
-                    {book.synopsis
-                      ? book.synopsis.slice(0, 100) + "..."
-                      : "No synopsis available..."}
+                    Copies available: {book.noOfCopies}
                   </Typography>
                 </Box>
               </Box>
@@ -144,4 +139,4 @@ const AuthorPage = () => {
   );
 };
 
-export default AuthorPage;
+export default LibraryPage;

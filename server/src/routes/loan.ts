@@ -221,6 +221,27 @@ router.get('/availBooks', librarianConfirmation, async (req, res) => {
   res.json(rows);
 });
 
+// Endpoint to get all active loans for this librarian's library
+router.get('/activeLoans', librarianConfirmation, async (req, res) => {
+  const libraryId = req.libraryId as number;
+
+  const getLoansForUserQuery = `
+      SELECT *
+      FROM loan_book lr
+      JOIN library_contains lc ON lr.book_id = lc.book_id AND lr.author_id = lc.author_id
+      WHERE lc.library_id = $1;
+      `;
+  const result = await db.query(getLoansForUserQuery, [libraryId.toString()]);
+
+  if (result.rows.length === 0) {
+    res.sendStatus(404);
+    return;
+  }
+
+  const rows = result.rows as Record<string, unknown>[];
+  res.json(rows);
+});
+
 router.post(
   '/',
   body(['bookId', 'authorId']).isInt({ min: 1 }),
