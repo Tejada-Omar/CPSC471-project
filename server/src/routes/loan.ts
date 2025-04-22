@@ -82,10 +82,11 @@ async function removeLoan(
   const deleteLoanQuery = `
     DELETE FROM loan
     WHERE loan_id = $1 AND user_id = $2
-      AND NOT EXISTS
-        (SELECT 1 FROM loan_book WHERE loan_id = $1 AND user_id = $2)
-      AND NOT EXISTS
-        (SELECT 1 FROM loan_request WHERE loan_id = $1 AND user_id = $2)
+      AND NOT EXISTS (
+        SELECT 1 FROM loan_book WHERE loan_id = $1 AND user_id = $2
+        UNION
+        SELECT 1 FROM loan_request WHERE loan_id = $1 AND user_id = $2
+      )
     RETURNING 'deleted' AS status;
     `;
   const result = await client.query(deleteLoanQuery, [
