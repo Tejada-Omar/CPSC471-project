@@ -20,8 +20,7 @@ const RemoveBooksPage = () => {
 
   const [books, setBooks] = useState([]);
 
-  const [bookId, setBookId] = useState(0);
-  const [authorId, setAuthorId] = useState(0);
+  const [selectedBook, setSelectedBook] = useState("");
 
   const [isLoadingBooks, setIsLoadingBooks] = useState(true);
 
@@ -50,65 +49,78 @@ const RemoveBooksPage = () => {
     navigate(url);
   };
 
-    const handleRemoveBook = async () => {
-      try {
-        const response = await fetch(`${API_URL}/book/${bookId}?authorId=${authorId}`, {
+  const handleRemoveBook = async () => {
+    setBookError("");
+    setBookSuccess("");
+    try {
+      const response = await fetch(
+        `${API_URL}/book/${selectedBook.id}?authorId=${selectedBook.authorId}`,
+        {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          // If the response is not successful, show an error
-          throw new Error(data.error || "An unexpected error occurred");
         }
+      );
 
-        setBookSuccess("Book deleted successfully");
-        setBookError("");
-      } catch (error) {
-        setBookError("Could not delete book successfully. Check fields and try again. :" + error.message);
-        setBookSuccess("");
+      console.log(selectedBook.id, selectedBook.authorId);
+      const data = await response.json();
+
+      if (!response.ok) {
+        // If the response is not successful, show an error
+        throw new Error(data.error || "An unexpected error occurred");
       }
-    };
+
+      setBookSuccess("Book deleted successfully");
+      setBookError("");
+    } catch (error) {
+      setBookError(
+        "Could not delete book successfully. Check fields and try again. :" +
+          error.message
+      );
+      setBookSuccess("");
+    }
+  };
 
   if (isLoadingBooks) {
     return <>loading...</>;
   }
 
   return (
-    <Box id="removeBooksAuthorsBox">
-      <Box id="removeBooksAuthorsHeader">
-        <Typography variant="h3">Remove Books or Authors</Typography>
+    <Box id="removeBooksBox">
+      <Box id="removeBooksHeader">
+        <Typography variant="h3">Remove Books</Typography>
         <Button onClick={() => handleClick("/librarian")}>
           Back to dashboard
         </Button>
       </Box>
 
-      <Box id="removeBooksAuthorsBody">
-        <Stack component="form" class="removeBooksAuthorsForm" spacing={4}>
+      <Box id="removeBooksBody">
+        <Stack component="form" class="removeBooksForm" spacing={4}>
           {bookSuccess && (
-          <p style={{ color: "green", textAlign: "center" }}>{bookSuccess}</p>
-        )}
-        {bookError && <p style={{ color: "red", textAlign: "center" }}>{bookError}</p>}
+            <p style={{ color: "green", textAlign: "center" }}>{bookSuccess}</p>
+          )}
+          {bookError && (
+            <p style={{ color: "red", textAlign: "center" }}>{bookError}</p>
+          )}
           <Stack spacing={4}>
             {/*  Select Book */}
             <FormControl size="small">
               <InputLabel>Book</InputLabel>
               <Select
                 label="Book"
-                onChange={(event) => setBookId(Number(event.target.value[0]), setAuthorId(Number(event.target.value[1])))}
+                onChange={(event) => setSelectedBook(event.target.value)}
               >
                 {books.map((book) => (
-                  <MenuItem key={book.id} value={book.id}>
+                  <MenuItem key={book.id} value={book}>
                     {book.title}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
-            <Button sx={{ color: "red" }} onClick={handleRemoveBook}>Remove Book</Button>
+            <Button sx={{ color: "red" }} onClick={handleRemoveBook}>
+              Remove Book
+            </Button>
           </Stack>
         </Stack>
       </Box>

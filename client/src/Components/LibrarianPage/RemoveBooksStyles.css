@@ -1,18 +1,16 @@
-#removeBooksAuthorsBox {
+#removeBooksBox {
     margin: 0 10% 0 10%;
 }
 
-#removeBooksAuthorsHeader{
+#removeBooksHeader{
     display: flex;
     justify-content: space-between;
 }
 
-.removeBooksAuthorsForm {
+.removeBooksForm {
     margin-top: 2%;
 }
 
-#removeBooksAuthorsBody {
-    display: flex;
-    justify-content: space-between;
+#removeBooksBody {
     margin: 10% 20% 0% 20%;
 }
