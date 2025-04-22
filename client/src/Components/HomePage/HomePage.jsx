@@ -7,6 +7,10 @@ import {
   Typography,
   Card,
   CardContent,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import SearchBar from "../SearchBar";
 import { API_URL } from "../../utils/constants";
@@ -22,6 +26,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLibrarian, setIsLibrarian] = useState(false);
+  const [searchField, setSearchField] = useState("title");
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -95,9 +100,39 @@ const HomePage = () => {
     navigate(`/book/${book_id}/${author_id}`);
   };
 
-  const filteredBooks = books.filter((book) =>
-    book.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredBooks = books.filter((book) => {
+    const query = searchQuery.toLowerCase();
+
+    if (searchField === "title") {
+      return book.title.toLowerCase().includes(query);
+    }
+
+    if (searchField === "authorName") {
+      return book.authorName?.toLowerCase().includes(query);
+    }
+
+    if (searchField === "genres") {
+      return book.genres?.some((genre) =>
+        genre ? genre.toLowerCase().includes(query) : null
+      );
+    }
+
+    if (searchField === "synopsis") {
+      return book.synopsis.toLowerCase().includes(query);
+    }
+
+    return false;
+  });
+
+  const mapSearchToValue = (searchField) => {
+    if (searchField === "authorName") {
+      return "author";
+    } else if (searchField === "genres") {
+      return "genre";
+    } else if (searchField === "title" || searchField === "synopsis") {
+      return searchField;
+    }
+  };
 
   const handleSignOut = () => {
     localStorage.clear();
@@ -113,7 +148,6 @@ const HomePage = () => {
       <Box id="homeHeaderBox">
         <Typography variant="h2">OneShelf</Typography>
         <Box id="homeButtonBox">
-          
           {authToken && isAdmin ? (
             <Button onClick={() => handleClick("/admin")}>
               Admin Dashboard
@@ -144,10 +178,33 @@ const HomePage = () => {
         </Box>
       </Box>
 
-      <SearchBar
-        onSearchChange={setSearchQuery}
-        placeholder="Search for books..."
-      />
+      <Box
+        display="flex"
+        alignItems="center"
+        gap={2}
+        justifyContent="center"
+        flexWrap="wrap"
+      >
+        <SearchBar
+          onSearchChange={setSearchQuery}
+          placeholder={`Search by ${mapSearchToValue(searchField)}...`}
+        />
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel id="search-field-label">Search By</InputLabel>
+          <Select
+            labelId="search-field-label"
+            id="search-field"
+            value={searchField}
+            label="Search By"
+            onChange={(e) => setSearchField(e.target.value)}
+          >
+            <MenuItem value="title">Title</MenuItem>
+            <MenuItem value="authorName">Author</MenuItem>
+            <MenuItem value="genres">Genre</MenuItem>
+            <MenuItem value="synopsis">Synopsis</MenuItem>
+          </Select>
+        </FormControl>
+      </Box>
 
       <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
         {filteredBooks.map((book) => (

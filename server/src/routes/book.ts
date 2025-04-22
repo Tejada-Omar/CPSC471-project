@@ -32,15 +32,48 @@ export function mapBookResult(row: Record<string, unknown>): Book {
   };
 }
 
+export interface ExtendedBook {
+  id: number;
+  authorId: number;
+  title: string;
+  publishedDate: Date;
+  synopsis: string;
+  noOfCopies?: number;
+  authorName: string;
+  genres: string[];
+}
+
+export function mapExtendedBookResult(
+  row: Record<string, unknown>,
+): ExtendedBook {
+  return {
+    id: row.book_id as number,
+    authorId: row.author_id as number,
+    publishedDate: row.pdate as Date,
+    synopsis: row.synopsis as string,
+    title: row.title as string,
+    noOfCopies:
+      row.no_of_copies !== undefined ? (row.no_of_copies as number) : undefined,
+    authorName: row.author as string,
+    genres: row.genres as string[],
+  };
+}
+
 // Search for a book by the title
 router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   const vResult = validationResult(req);
 
   // If no query, return all books
   if (!vResult.isEmpty()) {
-    const result = await db.query('SELECT * FROM book');
+    const result =
+      await db.query(`SELECT b.book_id, b.title, b.pdate, b.synopsis, a.author_id, a.aname AS author,
+        ARRAY_AGG(g.label) AS genres
+        FROM book b
+        JOIN author a ON b.author_id = a.author_id
+        LEFT JOIN genre g ON b.book_id = g.book_id
+        GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname, a.author_id;`);
     const rows = result.rows as Record<string, unknown>[];
-    res.json(rows.map((r) => mapBookResult(r)));
+    res.json(rows.map((r) => mapExtendedBookResult(r)));
     return;
   }
 
@@ -167,7 +200,7 @@ router.delete(
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {
-      res.status(200).json({ success: true, message: "Book deleted" });
+      res.status(200).json({ success: true, message: 'Book deleted' });
     }
   },
 );
