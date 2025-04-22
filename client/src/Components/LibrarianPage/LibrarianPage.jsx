@@ -25,7 +25,7 @@ const LibrarianPage = () => {
             Add Author
           </Button>
 
-          <Button sx={{color: 'red'}} onClick={() => handleClick("/removeBooksAuthors")}>
+          <Button sx={{color: 'red'}} onClick={() => handleClick("/removeBooks")}>
             Remove Books or Authors
           </Button>
         </Box>

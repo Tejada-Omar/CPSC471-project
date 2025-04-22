@@ -19,36 +19,17 @@ import GenreSelect from "./Components/GenreSelect";
 const AddBookPage = () => {
   const authToken = localStorage.getItem("authToken");
 
-  const [libraries, setLibraries] = useState([]);
   const [authors, setAuthors] = useState([]);
 
-  const [libraryId, setLibraryId] = useState(0);
   const [title, setTitle] = useState("");
   const [authorId, setAuthorId] = useState(0);
   const [synopsis, setSynopsis] = useState("");
   const [publishingDate, setPublishingDate] = useState();
   const [genres, setGenres] = useState([]);
   const [noOfCopies, setNoOfCopies] = useState(0);
-  const [isLoadingLibraries, setIsLoadingLibraries] = useState(true);
   const [isLoadingAuthors, setIsLoadingAuthors] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  useEffect(() => {
-    const fetchLibraries = async () => {
-      try {
-        const response = await fetch(`${API_URL}/library`);
-        const data = await response.json();
-        setLibraries(data);
-      } catch (err) {
-        console.error("Failed to fetch libraries:", err);
-      } finally {
-        setIsLoadingLibraries(false); // Set loading to false when done
-      }
-    };
-
-    fetchLibraries();
-  }, []);
 
   useEffect(() => {
     const fetchAuthors = async () => {
@@ -74,9 +55,6 @@ const AddBookPage = () => {
 
   const handleAddBook = async () => {
     try {
-      let testGenre = "Sports";
-      console.log(authorId, title, genres, publishingDate, synopsis, noOfCopies)
-      
       const response = await fetch(`${API_URL}/book`, {
         method: "POST",
         headers: {
@@ -103,7 +81,7 @@ const AddBookPage = () => {
     }
   };
 
-  if (isLoadingLibraries || isLoadingAuthors) {
+  if (isLoadingAuthors) {
     return <>loading...</>;
   }
 
@@ -117,21 +95,6 @@ const AddBookPage = () => {
       </Box>
 
       <Stack component="form" id="addBookForm" spacing={4}>
-        {/* Select Library */}
-        <FormControl size="small">
-          <InputLabel>Library</InputLabel>
-          <Select
-            label="Library"
-            onChange={(event) => setLibraryId(Number(event.target.value))}
-          >
-            {libraries.map((library) => (
-              <MenuItem key={library.id} value={library.id}>
-                {library.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
         {/* Input Title */}
         <TextField
           label="Title"

@@ -48,7 +48,6 @@ const HomePage = () => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        const data = await response.json();
 
         if (response.status === 200) {
           setIsAdmin(true);
@@ -73,7 +72,6 @@ const HomePage = () => {
             Authorization: `Bearer ${authToken}`,
           },
         });
-        const data = await response.json();
 
         if (response.status === 200) {
           setIsLibrarian(true);
