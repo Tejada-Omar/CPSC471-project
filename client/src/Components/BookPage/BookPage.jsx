@@ -263,9 +263,23 @@ const BookPage = () => {
                   sx={{ border: "1px solid #eee", borderRadius: 2 }}
                 >
                   <Box>
-                    <Typography variant="subtitle1">
-                      {library.library_name}
-                    </Typography>
+                    <Link
+                      to={`/library/${library.library_id}`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      <Typography
+                        variant="subtitle1"
+                        color="text.primary"
+                        sx={{
+                          "&:hover": {
+                            color: "primary.main",
+                            cursor: "pointer",
+                          },
+                        }}
+                      >
+                        {library.library_name}
+                      </Typography>
+                    </Link>
                     <Typography variant="body2" color="text.secondary">
                       Copies available: {library.no_of_copies}
                     </Typography>

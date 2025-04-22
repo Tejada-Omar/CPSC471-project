@@ -11,6 +11,7 @@ import AddAuthorPage from "./Components/LibrarianPage/AddAuthorPage"
 import RemoveBooksAuthorsPage from "./Components/LibrarianPage/RemoveBooksAuthorsPage"
 import AddLibraryPage from "./Components/AdminPage/AddLibraryPage"
 import AuthorPage from "./Components/AuthorPage/AuthorPage";
+import LibraryPage from "./Components/LibraryPage/LibraryPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/user" element={<UserPage></UserPage>}></Route>
           <Route path="/book/:bookId/:authorId" element={<BookPage />} />
           <Route path="/author/:authorId" element={<AuthorPage/>}></Route>
+          <Route path="/library/:libraryId" element={<LibraryPage/>}></Route>
           <Route path="/addBook" element={<AddBookPage></AddBookPage>}></Route>
           <Route path="/addAuthor" element={<AddAuthorPage></AddAuthorPage>}></Route>
           <Route path="/addLibrary" element={<AddLibraryPage></AddLibraryPage>}></Route>
