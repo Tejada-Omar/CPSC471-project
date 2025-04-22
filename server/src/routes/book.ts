@@ -143,7 +143,7 @@ router.get(
 
     const data = matchedData(req);
     const searchByIdQuery = `
-      SELECT
+    SELECT
       b.book_id,
       b.title,
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
