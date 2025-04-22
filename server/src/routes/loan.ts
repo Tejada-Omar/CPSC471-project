@@ -280,11 +280,10 @@ router.post(
 router.patch(
   '/:loanId',
   param('loanId').isInt({ min: 1 }),
-  body(['bookId', 'authorId']).isInt({ min: 1 }),
+  body(['bookId', 'authorId', 'userId']).isInt({ min: 1 }),
   librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
-    const userId = req.userId as number;
     const libraryId = req.libraryId as number;
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
@@ -305,7 +304,7 @@ router.patch(
         `;
       const result = await client.query(setLibrarianQuery, [
         data.loanId,
-        userId,
+        data.userId,
         libraryId,
       ]);
       if (result.rows.length === 0) {
@@ -316,7 +315,7 @@ router.patch(
         loanId: data.loanId as number,
         bookId: data.bookId as number,
         authorId: data.authorId as number,
-        userId: userId,
+        userId: data.userId as number,
         libraryId: libraryId,
       };
       await removeLoanReq(false, client, params);
@@ -328,7 +327,7 @@ router.patch(
         `;
       await client.query(insertLoanAppQuery, [
         data.loanId,
-        userId,
+        data.userId,
         data.bookId,
         data.authorId,
       ]);
