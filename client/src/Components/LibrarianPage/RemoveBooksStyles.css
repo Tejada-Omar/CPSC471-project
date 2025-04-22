@@ -1,0 +1,16 @@
+#removeBooksBox {
+    margin: 0 10% 0 10%;
+}
+
+#removeBooksHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.removeBooksForm {
+    margin-top: 2%;
+}
+
+#removeBooksBody {
+    margin: 10% 20% 0% 20%;
+}
