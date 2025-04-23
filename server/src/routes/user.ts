@@ -301,4 +301,33 @@ userRouter.get(
   },
 );
 
+// Delete a user
+userRouter.delete(
+  '/',
+  body(['userId']).isInt({ min: 1 }),
+  adminConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const vResult = validationResult(req);
+
+      if (!vResult.isEmpty()) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const data = matchedData(req);
+
+      await db.query(
+        `DELETE FROM users
+        WHERE user_id = $1`,
+        [data.userId],
+      );
+
+      return res.status(200).json({ message: 'user deleted' });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
 export default userRouter;
