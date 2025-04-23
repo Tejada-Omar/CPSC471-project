@@ -330,4 +330,41 @@ userRouter.delete(
   },
 );
 
+// Remove a librarian
+userRouter.delete(
+  '/librarian',
+  body(['userId']).isInt({ min: 1 }),
+  headLibrarianConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const vResult = validationResult(req);
+
+      if (!vResult.isEmpty()) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const libraryId = req.libraryId;
+
+      const data = matchedData(req);
+
+      const result = await db.query(
+        `DELETE FROM librarian
+         WHERE librarian_id = $1 AND library_id = $2`,
+        [data.userId, libraryId],
+      );
+
+      if (result.rowCount === 0) {
+        return res
+          .status(404)
+          .json({ message: 'Librarian not found for this library' });
+      }
+
+      return res.status(200).json({ message: 'user deleted' });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
 export default userRouter;
