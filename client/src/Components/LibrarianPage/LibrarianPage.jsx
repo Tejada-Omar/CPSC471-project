@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -9,18 +9,46 @@ import {
   Paper,
 } from "@mui/material";
 
+import "./LibrarianStyles.css";
+import { API_URL } from "../../utils/constants";
+
 import PendingLoansList from "./Components/PendingLoansList";
 import ActiveLoansList from "./Components/ActiveLoansList";
 
-import "./LibrarianStyles.css";
-
-
 const LibrarianPage = () => {
+  const authToken = localStorage.getItem("authToken");
+
+  const [isHeadLibrarian, setIsHeadLibrarian] = useState(false);
+
   const navigate = useNavigate();
 
   const handleClick = (url) => {
     navigate(url);
   };
+
+  useEffect(() => {
+    const fetchIsHeadLibrarian = async () => {
+      try {
+        const response = await fetch(`${API_URL}/user/checkHeadLibrarian`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.status === 200) {
+          setIsHeadLibrarian(true);
+        } else {
+          setIsHeadLibrarian(false);
+        }
+      } catch (err) {
+        console.error("Failed to fetch head librarian status", err);
+        setIsHeadLibrarian(false);
+      }
+    };
+
+    fetchIsHeadLibrarian();
+  }, [authToken]);
 
   return (
     <Box id="librarianBox">
@@ -43,10 +71,14 @@ const LibrarianPage = () => {
         </Box>
 
         <Box>
-          <Button onClick={() => handleClick("/manageLibrarians")}>
-            {" "}
-            Manage Librarians{" "}
-          </Button>
+          {isHeadLibrarian ? (
+            <Button onClick={() => handleClick("/manageLibrarians")}>
+              {" "}
+              Manage Librarians{" "}
+            </Button>
+          ) : (
+            <></>
+          )}
         </Box>
       </Box>
 

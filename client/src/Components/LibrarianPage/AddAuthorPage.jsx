@@ -40,7 +40,7 @@ const AddAuthorPage = () => {
       setSuccess("Author added successfully");
       setError("");
     } catch (error) {
-      setError("Could not add author successfully. Check fields and try again.");
+      setError("Could not add author successfully. Check fields and try again. :" + error.message);
       setSuccess("");
     }
   };

@@ -2,43 +2,38 @@ import { Button } from "@mui/material";
 
 import { API_URL } from "../../../utils/constants";
 
-const RemoveButton = ({ loan, authToken, fetchData }) => {
-  const handleRemoveLoan = async (authToken) => {
+const RemoveReviewButton = ({ review, authToken, fetchData }) => {
+  const handleRemoveReview = async (authToken) => {
     try {
       const userResponse = confirm(
-        `Remove this loan for ${loan.title}?`,
+        `Remove this review with id ${review.review_id}?`,
       );
-      console.log(loan);
+
       if (!userResponse) {
         return;
       }
 
-      console.log("Approving loan with Loan ID:", loan.loan_id);
+      console.log("Deleting review with Review ID:", review.review_id);
 
       // API call
-      const response = await fetch(`${API_URL}/loan/${loan.loan_id}`, {
-        method: "PATCH",
+      const response = await fetch(`${API_URL}/review/${review.review_id}`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({
-          bookId: loan.book_id,
-          authorId: loan.author_id,
-          userId: loan.user_id
-        }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to approve the loan request");
+        throw new Error("Failed to delete the review");
       }
 
       fetchData();
 
-      // Successfully approve loan, update UI or show success
-      alert(`Loan for ${loan.title} has been approved successfully!`);
+      // Successfully delete review, update UI or show success
+      alert(`Review ${review.review_id} has been deleted successfully!`);
     } catch (error) {
-      alert("Failed to approve the loan request: " + error.message);
+      alert("Failed to delete the review: " + error.message);
     }
   };
 
@@ -46,11 +41,11 @@ const RemoveButton = ({ loan, authToken, fetchData }) => {
     <Button
       variant="contained"
       color="primary"
-      onClick={() => handleRemoveLoan(authToken)}
+      onClick={() => handleRemoveReview(authToken)}
     >
-      Remove Loan
+      Remove Review
     </Button>
   );
 };
 
-export default RemoveButton;
+export default RemoveReviewButton;

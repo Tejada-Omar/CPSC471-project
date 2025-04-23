@@ -1,0 +1,16 @@
+#manageLibrariansBox {
+    margin: 0 10% 0 10%;
+}
+
+#manageLibrariansHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.manageLibrariansForm {
+    margin-top: 2%;
+}
+
+#manageLibrariansBody {
+    margin: 10% 20% 0% 20%;
+}

@@ -19,7 +19,6 @@ const ReviewsList = ({ title }) => {
       });
 
       const reviewData = await loanResponse.json();
-      console.log(reviewData)
       setReviewData(reviewData);
     } catch (err) {
       console.error("Failed to fetch data:", err);
@@ -64,9 +63,13 @@ const ReviewsList = ({ title }) => {
                   <Typography variant="h6">Book ID: {review.book_id}</Typography>
                   <Typography variant="h6">Rating: {review.rating}</Typography>
                 </Stack>
-                <Typography variant="h6">Body: {review.body}</Typography>
+                <Typography variant="h6" marginBottom={1}>Body: {review.body}</Typography>
                 </Box>
-                
+                <RemoveReviewButton
+                    review={review}
+                    authToken={authToken}
+                    fetchData={fetchData}
+                  />
               </CardContent>
             </Card>
           );

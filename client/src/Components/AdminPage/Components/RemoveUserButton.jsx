@@ -2,43 +2,39 @@ import { Button } from "@mui/material";
 
 import { API_URL } from "../../../utils/constants";
 
-const ApproveButton = ({ loan, authToken, fetchData }) => {
-  const handleApproveLoan = async (authToken) => {
+const RemoveUserButton = ({ user, authToken, fetchData }) => {
+  const handleRemoveUser = async (authToken) => {
     try {
       const userResponse = confirm(
-        `Approve this loan for ${loan.title}?`,
+        `Remove this user with id ${user.user_id}?`,
       );
-      console.log(loan);
+
       if (!userResponse) {
         return;
       }
 
-      console.log("Approving loan with Loan ID:", loan.loan_id);
+      console.log("Deleting user with User ID:", user.user_id);
 
       // API call
-      const response = await fetch(`${API_URL}/loan/${loan.loan_id}`, {
-        method: "PATCH",
+      const response = await fetch(`${API_URL}/user/`, {
+        method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${authToken}`,
         },
-        body: JSON.stringify({
-          bookId: loan.book_id,
-          authorId: loan.author_id,
-          userId: loan.user_id
-        }),
+        body: JSON.stringify({userId: user.user_id}),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to approve the loan request");
+        throw new Error("Failed to delete the user");
       }
 
       fetchData();
 
-      // Successfully approve loan, update UI or show success
-      alert(`Loan for ${loan.title} has been approved successfully!`);
+      // Successfully delete user, update UI or show success
+      alert(`User ${user.user_id} has been deleted successfully!`);
     } catch (error) {
-      alert("Failed to approve the loan request: " + error.message);
+      alert("Failed to delete the user: " + error.message);
     }
   };
 
@@ -46,11 +42,11 @@ const ApproveButton = ({ loan, authToken, fetchData }) => {
     <Button
       variant="contained"
       color="primary"
-      onClick={() => handleApproveLoan(authToken)}
+      onClick={() => handleRemoveUser(authToken)}
     >
-      Approve Loan
+      Remove User
     </Button>
   );
 };
 
-export default ApproveButton;
+export default RemoveUserButton;
