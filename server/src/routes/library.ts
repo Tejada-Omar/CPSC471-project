@@ -171,7 +171,7 @@ router.delete(
     if (result.rows.length === 0) {
       res.sendStatus(404);
     } else {
-      res.sendStatus(204);
+      res.status(200).json({ success: true, message: 'Author deleted' });
     }
   },
 );

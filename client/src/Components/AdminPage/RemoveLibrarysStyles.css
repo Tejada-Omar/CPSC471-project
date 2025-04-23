@@ -1,0 +1,16 @@
+#removeLibrarysBox {
+    margin: 0 10% 0 10%;
+}
+
+#removeLibrarysHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.removeLibrarysForm {
+    margin-top: 2%;
+}
+
+#removeLibrarysBody {
+    margin: 10% 20% 0% 20%;
+}
