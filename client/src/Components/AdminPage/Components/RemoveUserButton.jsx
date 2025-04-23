@@ -8,7 +8,7 @@ const ApproveButton = ({ loan, authToken, fetchData }) => {
       const userResponse = confirm(
         `Approve this loan for ${loan.title}?`,
       );
-      console.log(loan);
+
       if (!userResponse) {
         return;
       }

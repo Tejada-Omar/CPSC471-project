@@ -38,7 +38,7 @@ const RemoveLibrarysPage = () => {
         }
       );
       const data = await response.json();
-      console.log(data);
+
       setLibrarys(data);
     } catch (err) {
       console.error("Failed to fetch librarys:", err);
@@ -60,7 +60,7 @@ const RemoveLibrarysPage = () => {
   const handleRemoveLibrary = async () => {
     setLibraryError("");
     setLibrarySuccess("");
-    console.log(selectedLibrary)
+
     try {
       const response = await fetch(
         `${API_URL}/library/${selectedLibrary}`,
@@ -72,7 +72,6 @@ const RemoveLibrarysPage = () => {
         }
       );
 
-      console.log(selectedLibrary);
       const data = await response.json();
 
       if (!response.ok) {

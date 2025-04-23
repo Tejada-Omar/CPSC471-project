@@ -38,7 +38,7 @@ const RemoveAuthorsPage = () => {
         }
       );
       const data = await response.json();
-      console.log(data);
+
       setAuthors(data);
     } catch (err) {
       console.error("Failed to fetch authors:", err);
@@ -60,7 +60,7 @@ const RemoveAuthorsPage = () => {
   const handleRemoveAuthor = async () => {
     setAuthorError("");
     setAuthorSuccess("");
-    console.log(selectedAuthor)
+
     try {
       const response = await fetch(
         `${API_URL}/author/${selectedAuthor}`,
@@ -72,7 +72,6 @@ const RemoveAuthorsPage = () => {
         }
       );
 
-      console.log(selectedAuthor);
       const data = await response.json();
 
       if (!response.ok) {

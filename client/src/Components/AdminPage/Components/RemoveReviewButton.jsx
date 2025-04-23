@@ -8,7 +8,7 @@ const RemoveReviewButton = ({ review, authToken, fetchData }) => {
       const userResponse = confirm(
         `Remove this review with id ${review.review_id}?`,
       );
-      console.log(review);
+
       if (!userResponse) {
         return;
       }

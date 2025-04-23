@@ -19,7 +19,6 @@ const ReviewsList = ({ title }) => {
       });
 
       const reviewData = await loanResponse.json();
-      console.log(reviewData)
       setReviewData(reviewData);
     } catch (err) {
       console.error("Failed to fetch data:", err);
