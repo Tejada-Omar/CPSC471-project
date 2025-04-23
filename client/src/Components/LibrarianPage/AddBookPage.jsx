@@ -131,7 +131,11 @@ const AddBookPage = () => {
           label="Publishing Date"
           variant="outlined"
           size="small"
+          type="date"
           onChange={(event) => setPublishingDate(event.target.value)}
+          InputLabelProps={{
+            shrink: true, // ensures the label stays visible when date is selected
+          }}
         ></TextField>
 
         {/* Input Genres */}
@@ -142,6 +146,7 @@ const AddBookPage = () => {
           label="Copies"
           variant="outlined"
           size="small"
+          type="number"
           onChange={(event) => setNoOfCopies(Number(event.target.value))}
         ></TextField>
         {success && (
