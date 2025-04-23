@@ -310,6 +310,7 @@ router.patch(
   librarianConfirmation,
   async (req, res) => {
     const vResult = validationResult(req);
+    const userId = req.userId;
     const libraryId = req.libraryId as number;
     if (!vResult.isEmpty()) {
       res.sendStatus(400);
@@ -331,7 +332,7 @@ router.patch(
       const result = await client.query(setLibrarianQuery, [
         data.loanId,
         data.userId,
-        libraryId,
+        userId,
       ]);
       if (result.rows.length === 0) {
         throw new DbError(404, 'Could not find librarian user to approve loan');
