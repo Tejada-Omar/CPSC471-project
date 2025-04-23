@@ -212,6 +212,25 @@ userRouter.get(
   },
 );
 
+// Get all head librarians
+userRouter.get(
+  '/allHeadLibrarians',
+  adminConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const result = await db.query(
+        `SELECT *
+       FROM users AS u
+       JOIN head_librarian AS hl ON u.user_id = hl.super_id`,
+      );
+
+      return res.status(200).json(result.rows);
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
 // Add a librarian
 userRouter.post(
   '/librarian',

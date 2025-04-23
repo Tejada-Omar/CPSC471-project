@@ -1,0 +1,16 @@
+#unappointLibrarianBox {
+    margin: 0 10% 0 10%;
+}
+
+#unappointLibrarianHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.unappointLibrarianForm {
+    margin-top: 2%;
+}
+
+#unappointLibrarianBody {
+    margin: 10% 20% 0% 20%;
+}
