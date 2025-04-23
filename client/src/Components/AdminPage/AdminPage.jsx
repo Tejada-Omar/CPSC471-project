@@ -49,6 +49,13 @@ const AdminPage = () => {
         >
           Remove Authors
         </Button>
+
+        <Button
+          sx={{ color: "red" }}
+          onClick={() => handleClick("/unappointLibrarian")}
+        >
+          Unappoint Librarian
+        </Button>
       </Box>
 
       <Paper
