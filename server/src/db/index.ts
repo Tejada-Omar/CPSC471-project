@@ -32,7 +32,7 @@ const getPassword = () => {
       // Line-endings are trimmed when password is created using PGPASSFILE
       // Emulates behaviour on unixy systems where LF is default line-ending
       // NOTE: No clue how this works on windows w/ CRLF line-endings
-      .slice(0)
+      .trimEnd()
   );
 };
 
