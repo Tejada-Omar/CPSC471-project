@@ -39,7 +39,7 @@ const getPassword = () => {
 const pool = new Pool({
   database: 'oneshelf',
   user: 'oneshelf',
-  host: 'localhost',
+  host: 'db',
   port: 5432,
   password: getPassword(),
 });
