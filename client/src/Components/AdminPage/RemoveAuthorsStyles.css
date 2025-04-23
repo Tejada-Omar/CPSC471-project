@@ -1,0 +1,16 @@
+#removeAuthorsBox {
+    margin: 0 10% 0 10%;
+}
+
+#removeAuthorsHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.removeAuthorsForm {
+    margin-top: 2%;
+}
+
+#removeAuthorsBody {
+    margin: 10% 20% 0% 20%;
+}

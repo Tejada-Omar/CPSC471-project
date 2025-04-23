@@ -35,7 +35,7 @@ const ManageLibrariansPage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch(`${API_URL}/user/allUsers`,
+        const response = await fetch(`${API_URL}/user/allNonLibrarians`,
           {
             method: "GET",
             headers: {
@@ -45,6 +45,7 @@ const ManageLibrariansPage = () => {
         );
         const data = await response.json();
         setUsers(data);
+        console.log(data);
       } catch (err) {
         console.error("Failed to fetch users:", err);
       } finally {

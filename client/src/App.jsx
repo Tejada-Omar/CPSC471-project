@@ -10,6 +10,7 @@ import BookPage from "./Components/BookPage/BookPage";
 import AddBookPage from "./Components/LibrarianPage/AddBookPage"
 import AddAuthorPage from "./Components/LibrarianPage/AddAuthorPage"
 import RemoveBooksPage from "./Components/LibrarianPage/RemoveBooksPage"
+import RemoveAuthorsPage from "./Components/AdminPage/RemoveAuthorsPage"
 import AddLibraryPage from "./Components/AdminPage/AddLibraryPage"
 import AuthorPage from "./Components/AuthorPage/AuthorPage";
 import LibraryPage from "./Components/LibraryPage/LibraryPage";
@@ -35,7 +36,7 @@ function App() {
           <Route path="/addLibrary" element={<AddLibraryPage></AddLibraryPage>}></Route>
           <Route path="/removeBooks" element={<RemoveBooksPage></RemoveBooksPage>}></Route>
           <Route path="/manageLibrarians" element={<ManageLibrariansPage></ManageLibrariansPage>}></Route>
-
+          <Route path="removeAuthors" element={<RemoveAuthorsPage></RemoveAuthorsPage>}></Route>
         </Routes>
       </BrowserRouter>
     </>

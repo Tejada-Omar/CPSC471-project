@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, TextField, Button, Stack, Typography, Paper } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Button,
+  Stack,
+  Typography,
+  Paper,
+} from "@mui/material";
 
 import "./AdminStyles.css";
 import UsersList from "./Components/UsersList";
@@ -20,7 +27,7 @@ const AdminPage = () => {
         <Button onClick={() => handleClick("/")}>Return home</Button>
       </Box>
 
-      <Box id="librarianButtons">
+      <Box id="adminButtons">
         <Button onClick={() => handleClick("/addLibrary")}>
           {" "}
           Add Library{" "}
@@ -28,6 +35,19 @@ const AdminPage = () => {
         <Button onClick={() => handleClick("/appointLibrarian")}>
           {" "}
           Appoint Librarian{" "}
+        </Button>
+
+        <Button
+          sx={{ color: "red" }}
+          onClick={() => handleClick("/removeLibrarys")}
+        >
+          Remove Library
+        </Button>
+        <Button
+          sx={{ color: "red" }}
+          onClick={() => handleClick("/removeAuthors")}
+        >
+          Remove Authors
         </Button>
       </Box>
 
@@ -38,7 +58,6 @@ const AdminPage = () => {
         <UsersList title={"Users"}></UsersList>
 
         <ReviewsList title="Reviews"></ReviewsList>
-
       </Paper>
     </Box>
   );
