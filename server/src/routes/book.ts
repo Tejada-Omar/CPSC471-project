@@ -80,10 +80,10 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   const data = matchedData(req);
   const searchByTitleQuery = `
     SELECT b.book_id, b.title, b.pdate, b.synopsis, a.aname AS author,
-      STRING_AGG(g.label, ', ') AS genres
+      COALESCE(STRING_AGG(g.label, ', '), '') AS genres
     FROM book b
-    JOIN author a ON b.author_id = a.author_id
-    LEFT JOIN genre g ON b.book_id = g.book_id
+    JOIN author a USING (author_id)
+    LEFT JOIN genre g ON g.book_id = b.book_id AND g.author_id = b.author_id
     WHERE b.title = $1
     GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname;
     `;
@@ -101,7 +101,7 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
 router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
   const libraryId = req.libraryId as number;
 
-  const searchByTitleQuery = `
+  const getAllLibraryBooks = `
     SELECT
       b.book_id,
       b.author_id,
@@ -109,16 +109,16 @@ router.get('/libraryBooks', librarianConfirmation, async (req, res) => {
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
       b.synopsis,
       a.aname AS author,
-      ARRAY_AGG(g.label) AS genres
+      COALESCE(ARRAY_AGG(g.label), '{}') AS genres
     FROM book b
     JOIN author a ON b.author_id = a.author_id
-    LEFT JOIN genre g ON b.book_id = g.book_id
+    LEFT JOIN genre g ON b.book_id = g.book_id AND b.author_id = g.author_id
     JOIN library_contains lc ON lc.book_id = b.book_id AND lc.author_id = b.author_id
     WHERE lc.library_id = $1
     GROUP BY b.book_id, b.author_id, b.title, b.pdate, b.synopsis, a.aname;
     `;
 
-  const result = await db.query(searchByTitleQuery, [libraryId.toString()]);
+  const result = await db.query(getAllLibraryBooks, [libraryId.toString()]);
   if (result.rows.length === 0) {
     res.sendStatus(404);
   } else {
@@ -143,16 +143,16 @@ router.get(
 
     const data = matchedData(req);
     const searchByIdQuery = `
-      SELECT
+    SELECT
       b.book_id,
       b.title,
       TO_CHAR(b.pdate, 'YYYY-MM-DD') AS pdate,
       b.synopsis,
       a.aname AS author,
-      ARRAY_AGG(g.label) AS genres
+      COALESCE(ARRAY_AGG(g.label), '{}') AS genres
     FROM book b
-    JOIN author a ON b.author_id = a.author_id
-    LEFT JOIN genre g ON b.book_id = g.book_id
+    JOIN author a USING (author_id)
+    LEFT JOIN genre g ON b.book_id = g.book_id AND b.author_id = g.author_id
     WHERE b.book_id = $1 AND a.author_id = $2
     GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname;
     `;
@@ -242,10 +242,10 @@ router.put(
         AND author_id = $2
         AND EXISTS (
           SELECT 1
-          FROM library_contains
-          WHERE book_id = $1
-            AND author_id = $2
-            AND library_id = $3
+          FROM library_contains lc
+          WHERE lc.book_id = $1
+            AND lc.author_id = $2
+            AND lc.library_id = $3
         )
       RETURNING 'updated' AS status;
       `;
