@@ -134,7 +134,7 @@ const AppointLibrarianPage = () => {
   return (
     <Box id="appointLibrarianBox">
       <Box id="appointLibrarianHeader">
-        <Typography variant="h3">Appoint Librarian</Typography>
+        <Typography variant="h3">Appoint Head Librarian</Typography>
         <Button onClick={() => handleClick("/admin")}>
           Back to dashboard
         </Button>

@@ -34,7 +34,7 @@ const AdminPage = () => {
         </Button>
         <Button onClick={() => handleClick("/appointLibrarian")}>
           {" "}
-          Appoint Librarian{" "}
+          Appoint Head Librarian{" "}
         </Button>
 
         <Button
