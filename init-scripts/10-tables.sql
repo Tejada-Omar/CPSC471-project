@@ -17,7 +17,7 @@ create table book (
   synopsis text,
   title varchar(64) not null,
   primary key (book_id, author_id),
-  foreign key (author_id) references author (author_id)
+  foreign key (author_id) references author (author_id) on delete cascade
 );
 
 create table genre (
@@ -25,7 +25,7 @@ create table genre (
   author_id int,
   label varchar(16),
   primary key (book_id, author_id, label),
-  foreign key (book_id, author_id) references book (book_id, author_id)
+  foreign key (book_id, author_id) references book (book_id, author_id) on delete cascade
 );
 
 create table library_contains (
@@ -34,8 +34,8 @@ create table library_contains (
   author_id int,
   no_of_copies int default 0,
   primary key (library_id, book_id, author_id),
-  foreign key (library_id) references library (library_id) on update cascade,
-  foreign key (book_id, author_id) references book (book_id, author_id) on update cascade
+  foreign key (library_id) references library (library_id) on update cascade on delete cascade,
+  foreign key (book_id, author_id) references book (book_id, author_id) on update cascade on delete cascade
 );
 
 create table users (
@@ -65,7 +65,7 @@ create table librarian (
   library_id int not null,
   foreign key (librarian_id) references users (user_id) on delete cascade,
   foreign key (manager_id) references head_librarian (super_id) on delete set null,
-  foreign key (library_id) references library (library_id)
+  foreign key (library_id) references library (library_id) on delete cascade
 );
 
 create table loan (
@@ -93,7 +93,7 @@ create table loan_request (
   book_id int not null,
   author_id int not null,
   foreign key (loan_id, user_id) references loan (loan_id, user_id) on delete cascade,
-  foreign key (book_id, author_id) references book (book_id, author_id),
+  foreign key (book_id, author_id) references book (book_id, author_id) on delete cascade,
   primary key (loan_id, user_id, book_id, author_id)
 );
 
@@ -103,7 +103,7 @@ create table loan_book (
   book_id int not null,
   author_id int not null,
   foreign key (loan_id, user_id) references loan (loan_id, user_id) on delete cascade,
-  foreign key (book_id, author_id) references book (book_id, author_id),
+  foreign key (book_id, author_id) references book (book_id, author_id) on delete cascade,
   primary key (loan_id, user_id, book_id, author_id)
 );
 
@@ -116,7 +116,7 @@ create table review (
   author_id int not null,
   primary key (review_id, user_id),
   foreign key (user_id) references users (user_id) on delete cascade,
-  foreign key (book_id, author_id) references book (book_id, author_id)
+  foreign key (book_id, author_id) references book (book_id, author_id) on delete cascade
 );
 
 -- 1. author table
