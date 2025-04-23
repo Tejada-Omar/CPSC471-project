@@ -32,50 +32,51 @@ const ManageLibrariansPage = () => {
   const [librarianError, setLibrarianError] = useState("");
   const [librarianSuccess, setLibrarianSuccess] = useState("");
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`${API_URL}/user/allNonLibrarians`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setUsers(data);
-        console.log(data);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-      } finally {
-        setIsLoadingUsers(false); // Set loading to false when done
-      }
-    };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${API_URL}/user/allNonLibrarians`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setUsers(data);
+      console.log(data);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+    } finally {
+      setIsLoadingUsers(false); // Set loading to false when done
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
-  useEffect(() => {
-    const fetchLibrarians = async () => {
-      try {
-        const response = await fetch(`${API_URL}/user/allLibrarians`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-        setLibrarians(data);
-      } catch (err) {
-        console.error("Failed to fetch librarians:", err);
-      } finally {
-        setIsLoadingLibrarians(false); // Set loading to false when done
-      }
-    };
+  const fetchLibrarians = async () => {
+    try {
+      const response = await fetch(`${API_URL}/user/allLibrarians`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setLibrarians(data);
+    } catch (err) {
+      console.error("Failed to fetch librarians:", err);
+    } finally {
+      setIsLoadingLibrarians(false); // Set loading to false when done
+    }
+  };
 
+  useEffect(() => {
     fetchLibrarians();
   }, []);
 
@@ -111,6 +112,9 @@ const ManageLibrariansPage = () => {
 
       setUserSuccess("User added successfully");
       setUserError("");
+
+      fetchLibrarians();
+      fetchUsers();
     } catch (error) {
       setUserError(
         "Could not add user successfully. Check fields and try again. :" +
@@ -128,12 +132,12 @@ const ManageLibrariansPage = () => {
       const response = await fetch(
         `${API_URL}/user/librarian`,
         {
-          method: "POST",
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({userId: selectedUserId}),
+          body: JSON.stringify({userId: selectedLibrarianId}),
         }
       );
 
@@ -146,6 +150,10 @@ const ManageLibrariansPage = () => {
 
       setLibrarianSuccess("Librarian removed successfully");
       setLibrarianError("");
+
+      fetchLibrarians();
+      fetchUsers();
+
     } catch (error) {
       setLibrarianError(
         "Could not remove librarian successfully. Check fields and try again. :" +
@@ -199,7 +207,7 @@ const ManageLibrariansPage = () => {
           {librarianSuccess && (
             <p style={{ color: "green", textAlign: "center" }}>{librarianSuccess}</p>
           )}
-          {userError && (
+          {librarianError && (
             <p style={{ color: "red", textAlign: "center" }}>{librarianError}</p>
           )}
           <Stack spacing={2} marginTop={8}>
@@ -217,7 +225,7 @@ const ManageLibrariansPage = () => {
                 ))}
               </Select>
             </FormControl>
-            <Button sx={{ color: "red" }}>
+            <Button sx={{ color: "red" }} onClick={handleRemoveLibrarian}>
               Remove Librarian
             </Button>
           </Stack>
