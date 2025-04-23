@@ -10,6 +10,19 @@ services:
       - frontend-node-modules:/app/node_modules
     ports:
       - "5173:5173"
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    volumes:
+      - ./server:/app
+      - backend-node-modules:/app/node_modules
+    ports:
+      - "8080:8080"
+    command: npm run dev
+    depends_on:
+      db:
+        condition: service_healthy
   db:
     image: postgres
     restart: unless-stopped
@@ -41,6 +54,7 @@ services:
 
 volumes:
   frontend-node-modules:
+  backend-node-modules:
 
 secrets:
   pgpass:
