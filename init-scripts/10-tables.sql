@@ -61,10 +61,10 @@ create table head_librarian (
 
 create table librarian (
   librarian_id int primary key,
-  manager_id int not null,
+  manager_id int,
   library_id int not null,
   foreign key (librarian_id) references users (user_id) on delete cascade,
-  foreign key (manager_id) references head_librarian (super_id),
+  foreign key (manager_id) references head_librarian (super_id) on delete set null,
   foreign key (library_id) references library (library_id)
 );
 

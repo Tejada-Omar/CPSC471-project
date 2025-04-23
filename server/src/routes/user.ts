@@ -367,4 +367,39 @@ userRouter.delete(
   },
 );
 
+// Remove a head librarian
+userRouter.delete(
+  '/headLibrarian',
+  body(['userId']).isInt({ min: 1 }),
+  adminConfirmation,
+  async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    try {
+      const vResult = validationResult(req);
+
+      if (!vResult.isEmpty()) {
+        res.sendStatus(400);
+        return;
+      }
+
+      const data = matchedData(req);
+
+      const result = await db.query(
+        `DELETE FROM head_librarian
+         WHERE super_id = $1`,
+        [data.userId],
+      );
+
+      if (result.rowCount === 0) {
+        return res
+          .status(404)
+          .json({ message: 'Librarian not found for this library' });
+      }
+
+      return res.status(200).json({ message: 'user deleted' });
+    } catch (error: any) {
+      next(error);
+    }
+  },
+);
+
 export default userRouter;
