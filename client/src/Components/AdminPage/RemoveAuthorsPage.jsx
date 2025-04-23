@@ -27,27 +27,27 @@ const RemoveAuthorsPage = () => {
   const [authorError, setAuthorError] = useState("");
   const [authorSuccess, setAuthorSuccess] = useState("");
 
-  useEffect(() => {
-    const fetchAuthors = async () => {
-      try {
-        const response = await fetch(`${API_URL}/author/`,
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-        console.log(data);
-        setAuthors(data);
-      } catch (err) {
-        console.error("Failed to fetch authors:", err);
-      } finally {
-        setIsLoadingAuthors(false); // Set loading to false when done
-      }
-    };
+  const fetchAuthors = async () => {
+    try {
+      const response = await fetch(`${API_URL}/author/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      setAuthors(data);
+    } catch (err) {
+      console.error("Failed to fetch authors:", err);
+    } finally {
+      setIsLoadingAuthors(false); // Set loading to false when done
+    }
+  };
 
+  useEffect(() => {
     fetchAuthors();
   }, []);
 
@@ -82,6 +82,8 @@ const RemoveAuthorsPage = () => {
 
       setAuthorSuccess("Author deleted successfully");
       setAuthorError("");
+
+      fetchAuthors();
     } catch (error) {
       setAuthorError(
         "Could not delete author successfully. Check fields and try again. :" +
@@ -99,7 +101,7 @@ const RemoveAuthorsPage = () => {
     <Box id="removeAuthorsBox">
       <Box id="removeAuthorsHeader">
         <Typography variant="h3">Remove Authors</Typography>
-        <Button onClick={() => handleClick("/librarian")}>
+        <Button onClick={() => handleClick("/admin")}>
           Back to dashboard
         </Button>
       </Box>
