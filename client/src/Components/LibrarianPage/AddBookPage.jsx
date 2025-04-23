@@ -26,7 +26,7 @@ const AddBookPage = () => {
   const [synopsis, setSynopsis] = useState("");
   const [publishingDate, setPublishingDate] = useState();
   const [genres, setGenres] = useState([]);
-  const [noOfCopies, setNoOfCopies] = useState(0);
+  const [noOfCopies, setNoOfCopies] = useState(1);
   const [isLoadingAuthors, setIsLoadingAuthors] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -147,7 +147,8 @@ const AddBookPage = () => {
           variant="outlined"
           size="small"
           type="number"
-          onChange={(event) => setNoOfCopies(Number(event.target.value))}
+          value={noOfCopies}
+          onChange={(event) => setNoOfCopies(Math.max(Number(event.target.value), 1))}
         ></TextField>
         {success && (
           <p style={{ color: "green", textAlign: "center" }}>{success}</p>
