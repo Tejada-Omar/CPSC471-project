@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Stack, Typography, Card, CardContent, Box } from "@mui/material";
 import { API_URL } from "../../../utils/constants";
 
-import RemoveUserButton from "./removeUserButton"
+import RemoveUserButton from "./RemoveUserButton";
 
 const UsersList = ({ title }) => {
   const authToken = localStorage.getItem("authToken");
@@ -44,7 +44,6 @@ const UsersList = ({ title }) => {
 
         {/* Generate a card for each loan */}
         {userData.map((user, index) => {
-
           return (
             <Card
               key={user.user_id}
@@ -55,12 +54,26 @@ const UsersList = ({ title }) => {
               }}
             >
               <CardContent>
-                <Stack direction={"row"} spacing={4} flexWrap="wrap" justifyContent={"space-between"} alignItems={"center"}>
-                <Typography variant="h6">User ID: {user.user_id}</Typography>
+                <Stack
+                  direction={"row"}
+                  spacing={4}
+                  flexWrap="wrap"
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  marginBottom={1}
+                >
+                  <Typography variant="h6">User ID: {user.user_id}</Typography>
                   <Typography variant="h6">Name: {user.uname}</Typography>
                   <Typography variant="h6">Address: {user.address}</Typography>
-                  <Typography variant="h6">Phone Number: {user.phone_no}</Typography>
+                  <Typography variant="h6">
+                    Phone Number: {user.phone_no}
+                  </Typography>
                 </Stack>
+                <RemoveUserButton
+                  user={user}
+                  authToken={authToken}
+                  fetchData={fetchData}
+                />
               </CardContent>
             </Card>
           );

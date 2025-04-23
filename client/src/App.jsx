@@ -4,14 +4,19 @@ import HomePage from "./Components/HomePage/HomePage";
 import SignUpPage from "./Components/SignUpPage/SignUpPage";
 import AdminPage from "./Components/AdminPage/AdminPage";
 import LibrarianPage from "./Components/LibrarianPage/LibrarianPage";
+import ManageLibrariansPage from "./Components/LibrarianPage/ManageLibrariansPage";
 import UserPage from "./Components/UserPage/UserPage";
 import BookPage from "./Components/BookPage/BookPage";
 import AddBookPage from "./Components/LibrarianPage/AddBookPage"
 import AddAuthorPage from "./Components/LibrarianPage/AddAuthorPage"
 import RemoveBooksPage from "./Components/LibrarianPage/RemoveBooksPage"
+import RemoveAuthorsPage from "./Components/AdminPage/RemoveAuthorsPage"
+import RemoveLibrarysPage from "./Components/AdminPage/RemoveLibrarysPage"
+import AppointLibrarianPage from "./Components/AdminPage/AppointLibrarianPage"
 import AddLibraryPage from "./Components/AdminPage/AddLibraryPage"
 import AuthorPage from "./Components/AuthorPage/AuthorPage";
 import LibraryPage from "./Components/LibraryPage/LibraryPage";
+
 
 function App() {
   return (
@@ -32,6 +37,10 @@ function App() {
           <Route path="/addAuthor" element={<AddAuthorPage></AddAuthorPage>}></Route>
           <Route path="/addLibrary" element={<AddLibraryPage></AddLibraryPage>}></Route>
           <Route path="/removeBooks" element={<RemoveBooksPage></RemoveBooksPage>}></Route>
+          <Route path="/manageLibrarians" element={<ManageLibrariansPage></ManageLibrariansPage>}></Route>
+          <Route path="/removeAuthors" element={<RemoveAuthorsPage></RemoveAuthorsPage>}></Route>
+          <Route path="/removeLibrarys" element={<RemoveLibrarysPage></RemoveLibrarysPage>}></Route>
+          <Route path="/appointLibrarian" element={<AppointLibrarianPage></AppointLibrarianPage>}></Route>
         </Routes>
       </BrowserRouter>
     </>

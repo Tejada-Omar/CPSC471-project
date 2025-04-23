@@ -1,0 +1,16 @@
+#appointLibrarianBox {
+    margin: 0 10% 0 10%;
+}
+
+#appointLibrarianHeader{
+    display: flex;
+    justify-content: space-between;
+}
+
+.appointLibrarianForm {
+    margin-top: 2%;
+}
+
+#appointLibrarianBody {
+    margin: 10% 20% 0% 20%;
+}
