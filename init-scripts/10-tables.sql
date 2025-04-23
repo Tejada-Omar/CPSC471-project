@@ -76,7 +76,7 @@ create table loan (
   librarian_id int,
   primary key (loan_id, user_id),
   foreign key (user_id) references users (user_id) on delete cascade,
-  foreign key (librarian_id) references librarian (librarian_id)
+  foreign key (librarian_id) references librarian (librarian_id) on delete set null
 );
 
 create table authentication (
@@ -92,8 +92,7 @@ create table loan_request (
   user_id int not null,
   book_id int not null,
   author_id int not null,
-  foreign key (loan_id) references loan (loan_id),
-  foreign key (user_id) references users (user_id) on delete cascade,
+  foreign key (loan_id, user_id) references loan (loan_id, user_id) on delete cascade,
   foreign key (book_id, author_id) references book (book_id, author_id),
   primary key (loan_id, user_id, book_id, author_id)
 );
@@ -103,8 +102,7 @@ create table loan_book (
   user_id int not null,
   book_id int not null,
   author_id int not null,
-  foreign key (loan_id) references loan (loan_id),
-  foreign key (user_id) references users (user_id) on delete cascade,
+  foreign key (loan_id, user_id) references loan (loan_id, user_id) on delete cascade,
   foreign key (book_id, author_id) references book (book_id, author_id),
   primary key (loan_id, user_id, book_id, author_id)
 );
