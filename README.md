@@ -39,3 +39,10 @@ This file is used to pass environment variables to the backend. Create a `.env` 
 PGPASSWORD=<your password, should be the same as the one in .pgpass>
 SECRET=<your secret string, should be quite long as this is used for encryption>
 ```
+
+## Default Credentials:  
+The application automatically creates an admin user with:  
+`Username: admin`  
+`Password: Password!`
+
+This account can be used for testing.
