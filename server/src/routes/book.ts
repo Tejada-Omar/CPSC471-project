@@ -67,10 +67,10 @@ router.get('/', query('title').trim().notEmpty(), async (req, res) => {
   if (!vResult.isEmpty()) {
     const result =
       await db.query(`SELECT b.book_id, b.title, b.pdate, b.synopsis, a.author_id, a.aname AS author,
-        ARRAY_AGG(g.label) AS genres
+        COALESCE(ARRAY_AGG(g.label), '{}') AS genres
         FROM book b
         JOIN author a ON b.author_id = a.author_id
-        LEFT JOIN genre g ON b.book_id = g.book_id
+        LEFT JOIN genre g ON b.book_id = g.book_id AND g.author_id = b.author_id
         GROUP BY b.book_id, b.title, b.pdate, b.synopsis, a.aname, a.author_id;`);
     const rows = result.rows as Record<string, unknown>[];
     res.json(rows.map((r) => mapExtendedBookResult(r)));

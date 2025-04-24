@@ -25,3 +25,17 @@ To start the entire stack (frontend, backend, and database), run:
 ```bash
 docker compose up --build
 ```
+
+## 🔐 Environment Configuration
+
+Before running the project, ensure the following files are present and properly configured:
+
+1. **.pgpass** (in the root directory):  
+   This file should contain your PostgreSQL password as a singular word, with no whitespace
+
+2. **.env** (in the `server/` directory):  
+This file is used to pass environment variables to the backend. Create a `.env` file with the following content:
+```
+PGPASSWORD=<your password, should be the same as the one in .pgpass>
+SECRET=<your secret string, should be quite long as this is used for encryption>
+```

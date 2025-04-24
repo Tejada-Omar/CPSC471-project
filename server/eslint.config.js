@@ -17,7 +17,6 @@ export default tseslint.config(
           destructuredArrayIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           ignoreRestSiblings: true,
-          endOfLine: 'auto',
         },
       ],
     },
